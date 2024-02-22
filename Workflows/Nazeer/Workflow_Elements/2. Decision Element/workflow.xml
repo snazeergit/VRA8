@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="50539b59-1e2a-4aed-839a-6bb6d2a180d5" editor-version="2.0" version="0.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
-    <display-name>Passing Variable Inputs Outputs Values</display-name>
+    <display-name>2. Decision Element</display-name>
     <position y="50.0" x="60.0"/>
     <input>
         <param name="num1" type="number"/>
@@ -44,7 +44,7 @@ else&#13;
         </in-binding>
         <out-binding/>
         <description>Custom decision based on a custom script.</description>
-        <position y="50.0" x="270.0"/>
+        <position y="50.0" x="260.0"/>
     </workflow-item>
     <workflow-item name="item4" out-name="item0" type="task" comparator="0">
         <display-name>Positive</display-name>
