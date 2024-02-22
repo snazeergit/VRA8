@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="25d6a852-a2f6-4179-b281-eea485b18b2a" editor-version="2.0" version="0.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Testing_User_Interaction_Element</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="in_0" type="string"/>
+    </input>
+    <output/>
+    <attrib name="scriptOut" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <attrib name="scriptIn" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <attrib name="timeout_date" type="Date">
+        <value encoded="n">20240104021400000+0000</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="420.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item4" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">scriptOut= in_0;&#13;
+System.log("Scriptable task..."+scriptOut);</script>
+        <in-binding>
+            <bind name="in_0" type="string" export-name="in_0"/>
+        </in-binding>
+        <out-binding>
+            <bind name="scriptOut" type="string" export-name="scriptOut"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="150.0"/>
+    </workflow-item>
+    <workflow-item name="item3" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="190.0" x="300.0"/>
+    </workflow-item>
+    <workflow-item name="item4" out-name="item0" alt-out-name="item5" type="custom-condition" comparator="0">
+        <display-name>Decision</display-name>
+        <script encoded="false">if(scriptOut=="Failure")&#13;
+    return false;&#13;
+return true;</script>
+        <in-binding>
+            <bind name="scriptOut" type="string" export-name="scriptOut"/>
+        </in-binding>
+        <out-binding/>
+        <description>Custom decision based on a custom script.</description>
+        <position y="50.0" x="265.0"/>
+    </workflow-item>
+    <workflow-item name="item5" out-name="item3" type="input" comparator="0">
+        <display-name>User interaction</display-name>
+        <in-binding>
+            <bind name="security.group" type="LdapGroup">
+                <description>Any user member of this group will be authorized to fill in this form.</description>
+            </bind>
+            <bind name="security.assignees" type="Array/LdapUser">
+                <description>Any user from this array of users will be authorized to fill in this form</description>
+            </bind>
+            <bind name="security.assignee.groups" type="Array/LdapGroup">
+                <description>Any user member of any of the groups will be authorized to fill in this form.</description>
+            </bind>
+            <bind name="timeout.date" type="Date" export-name="">
+                <description>If not null, this input item will wait until date and will continue workflow execution.</description>
+            </bind>
+        </in-binding>
+        <out-binding/>
+        <description>Use this element to set up a user interaction.</description>
+        <presentation/>
+        <position y="120.0" x="260.0"/>
+    </workflow-item>
+</ns2:workflow>
