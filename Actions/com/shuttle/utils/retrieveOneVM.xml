@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveOneVM" result-type="VC:VirtualMachine" api-version="6.0.0" id="9eb10296-24e2-41a8-a088-3663210691ae" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="hostname" t="string"/>
+  <param n="vcenter" t="string"/>
+  <script encoded="false"><![CDATA[if(hostname === null || hostname === undefined || hostname === ""){
+    throw("Hostname is empty. Need to specify hostname to search vm.")
+}
+var shortname = hostname.split(".")[0]
+System.debug("Shortname of this hostname is: " + shortname)
+
+if(vcenter == undefined){
+    vcenter = ""
+}
+var vm_objs = System.getModule("com.shuttle.utils").retrieveVMs(shortname, vcenter)
+
+System.debug(vm_objs[0])
+if(vm_objs.length == 1){
+    System.debug("Found one matching VM: " + (vm_objs[0]).name)
+    return vm_objs[0]
+}else if(vm_objs.length == 0){
+    System.error("Could not find matching vm with: " + hostname)
+    throw("Could not find matching vm with: " + hostname)
+}else if(vm_objs.length > 1){
+    System.error("Multiple VM found with: " + hostname)
+    for each(var vm in vm_objs){
+        System.error("Matching VM name: " + vm.name)
+    }
+    throw("Multiple VM found with: " + hostname)    
+}]]></script>
+</dunes-script-module>

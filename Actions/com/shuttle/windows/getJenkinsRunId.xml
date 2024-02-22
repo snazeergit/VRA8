@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getJenkinsRunId" result-type="string" api-version="6.0.0" id="35178fe1-9977-4002-99f7-1a987c068213" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.windows">
+  <param n="queue_id" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "Jenkins"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getQueueDetail")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var request = restOperation.createRequest([queue_id], null)
+request.setHeader("Accept", "application/json")
+System.debug("Rundeck request URL: " + request.fullUrl)
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 && statusCode !== 201){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+System.debug(res.contentAsString)
+
+var json = JSON.parse(res.contentAsString)
+var job_id = ""
+try {
+    job_id = json.executable.number
+}catch(e){
+    job_id = null
+}
+return job_id]]></script>
+</dunes-script-module>

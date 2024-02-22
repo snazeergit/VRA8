@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getEmailAddressFromAD" result-type="string" api-version="6.0.0" id="c96443a9-04ca-4e77-a2a7-a3c724ff9261" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.activedirectory">
+  <param n="userName" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ARS"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "soapHost")
+if( attr == null){
+    throw("Could not find soapHost object")
+}
+var soapHost = attr.value
+
+var basePsoID = "OU=FIL_Users,DC=intl,DC=intlroot,DC=fid-intl,DC=com"
+var operation = soapHost.getOperation("search");
+if (operation == null) throw "Operation 'search' not found!";
+
+// For debug
+var objInterceptor = new SOAPInterceptor(); 
+    objInterceptor.setRequestBodyInterceptor(requestBodyHandler); 
+	objInterceptor.setResponseBodyInterceptor(responseBodyHandler); 
+
+var request = operation.createSOAPRequest();
+	request.addInParameterAttribute(".","returnData","everything");
+	request.addInParameterAttribute("query","scope","subTree");
+	request.addInParameterAttribute("query.basePsoID","ID",basePsoID);
+	request.addInParameterAttribute("query.filter","xmlns:s4","urn:oasis:names:tc:DSML:2:0:core"); // This part is missing on WSDL and need to add manualy
+	if(userName.match(/^a[0-9]+$/i)){
+        request.addInParameterAttribute("query.filter.equalityMatch","name","sAMAccountName")
+    }else{
+        request.addInParameterAttribute("query.filter.equalityMatch","name","cn")
+    }
+	request.setInParameter("query.filter.equalityMatch.value",userName)
+var response = operation.invokeWithInterceptor(request,objInterceptor)
+var parameterNames = response.getOutParameters()
+if (parameterNames.length > 0) {
+	var email = returnEmailFromResponse(response)
+    System.log(email)
+    return email
+}else{
+	System.debug("There is no responce from ARS for : " + userName)
+    return null
+}
+
+
+function returnEmailFromResponse(response){
+    var parameterNames = response.getOutParameters()
+    for each(var p in parameterNames){
+        var m = p.match(/pso\[(\d)\]\.data.attr\[(\d)\]\.value\[\d\]/)
+        if(m){
+            var psoIndex = m[1]
+            var attrIndex = m[2]
+            var attrName = response.getOutParameterAttribute("pso[" + psoIndex + "].data.attr[" + attrIndex + "]", "name")
+            if(attrName === "mail"){
+                return response.getOutParameter(p)
+            }
+        }
+    }
+    return null
+}
+
+// Below are for debuging in case any issue...
+function requestBodyHandler(content) {   
+	System.debug("Soap requestBody is:")
+    System.debug(content)
+	System.debug('-----------')
+} 
+function responseBodyHandler(content) { 
+	System.debug("Soap responceBody is:")
+    System.debug(content)
+	System.debug('-----------')
+}]]></script>
+</dunes-script-module>

@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getSubnetAddr" result-type="string" api-version="6.0.0" id="c75a43a4-f414-40e0-a433-c441f31b36d8" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.qip">
+  <param n="ipaddress" t="string"/>
+  <script encoded="false"><![CDATA[//var hostname = "ukx11542"
+var categoryPath = "web-root"
+var elementName = "QIP"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getSubnetAddr")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "user")
+if( attr == null){
+    throw("Could not find QIP username from configuration")
+}
+user = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "password")
+if( attr == null){
+    throw("Could not find QIP password from configuration")
+}
+password = attr.value
+
+var data = [ipaddress]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application/json")
+request.setHeader("Authentication", "Basic "+user+":"+password)
+request.contentType = "application/json"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode == 404 && res.contentAsString == '{"error":"Not resource record found."}'){
+    System.debug("Could not find :" + ipaddress + " on QIP via RESET API")
+    return null
+}else if (statusCode == 200){
+    System.debug("Found ip: " + ipaddress + " on QIP via REST API")
+    var json = JSON.parse(res.contentAsString)
+    return json['subnetAddr']
+}else{
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+]]></script>
+</dunes-script-module>

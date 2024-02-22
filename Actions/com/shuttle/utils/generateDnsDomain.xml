@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="generateDnsDomain" result-type="string" api-version="6.0.0" id="2c2296f3-303e-4743-af0b-a1099a51a3a4" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="workload" t="string"/>
+  <param n="region" t="string"/>
+  <script encoded="false"><![CDATA[System.debug("-------------------------------")
+System.debug("# generateDnsDomain")
+System.debug("# workload: " + workload)
+System.debug("# region: " + region)
+System.debug("#")
+
+if(workload == "Windows" || workload == "Sql"){
+    if(System.getModule("com.shuttle.utils").isLab() == true){
+        return "intldev.intldevroot.fid-intl.com"   
+    }else{
+        return "intl.intlroot.fid-intl.com"
+    }
+}else{
+    var shortCode = System.getModule("com.shuttle.utils").getShortRegionCode(region)
+    return shortCode.toLowerCase() + ".fid-intl.com"
+}]]></script>
+</dunes-script-module>

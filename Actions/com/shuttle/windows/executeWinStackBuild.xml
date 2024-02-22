@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="executeWinStackBuild" result-type="string" api-version="6.0.0" id="4a4a984f-3807-487f-ba90-c04eb1ba24a8" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.windows">
+  <param n="hostname" t="string"/>
+  <param n="isBackup" t="boolean"/>
+  <param n="patchDay" t="string"/>
+  <param n="region" t="string"/>
+  <param n="appIdString" t="string"/>
+  <param n="environment" t="string"/>
+  <param n="datacenter" t="string"/>
+  <param n="projectCodeString" t="string"/>
+  <param n="userName" t="string"/>
+  <param n="domain" t="string"/>
+  <param n="order_id" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "Jenkins"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "Windows_Server_Post_Build")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var json_data = {
+    "ServerName": hostname,
+    "BackupEnabled": isBackup,
+    "PatchDay": patchDay,
+    "Region": region,
+    "PrimaryDC": datacenter,
+    "App_Id": appIdString,
+    "Environment": environment,
+    "Project_Code": projectCodeString,
+    "Requester": userName,
+    "AD_Domain": domain,
+    "ShuttleOrderID": order_id
+}
+
+var form_data = System.getModule("com.shuttle.utils").createFormDataFromJson(json_data)
+System.log(form_data)
+restOperation.urlTemplate += form_data
+var request = restOperation.createRequest(null, null)
+request.setHeader("Accept", "application/json")
+System.debug("Rundeck request URL: " + request.fullUrl)
+
+System.getModule("com.shuttle.utils").createLock("Windows_Server_Post_Build")
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 && statusCode !== 201){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+System.debug(res.contentAsString)
+
+var headers = res.getAllHeaders()
+for(var key in headers){
+    System.debug(key + ": " + headers[key])
+}
+var location = headers.Location.split('/')
+var queue_id = location.pop() | location.pop()
+System.debug("Jenkins queue ID is: " + queue_id)
+System.log("Start checking Jenkins run_id from queue_id")
+
+try{
+    for(var i=0; i<10; i++){
+        var run_id = System.getModule("com.shuttle.windows").getJenkinsRunId(queue_id)
+        if( run_id !== null){
+            LockingSystem.unlock("Windows_Server_Post_Build", "vRoAdmin")
+            break
+        }
+        System.sleep(5000)
+    }
+}catch(e){
+    LockingSystem.unlock("Windows_Server_Post_Build", "vRoAdmin")
+    throw("Windows build request had been posted to Jenkins. However, shuttle could not find Jenkins run_id from queue_id. We cannot track build progress.")
+}
+
+if(run_id === null){
+    LockingSystem.unlock("Windows_Server_Post_Build", "vRoAdmin")
+    throw("Windows build request had been posted and queeued in Jenkins. But could not retrieve run_id.")
+}
+return run_id]]></script>
+</dunes-script-module>

@@ -1,0 +1,202 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item6" object-name="workflow:name=generic" id="cca2b95a-ad22-4fb2-8d3e-3ece70d141d5" version="0.0.1" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Register Application Mapping on SNOW]]></display-name>
+  <position y="50.0" x="60.0"/>
+  <input>
+    <param name="appIdString" type="string"/>
+    <param name="hostname" type="string"/>
+    <param name="environment" type="string"/>
+  </input>
+  <attrib name="hostname_sys_id" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="app_sys_id" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="relation_type_id" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="content" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="120.0" x="640.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item2" type="task">
+    <display-name><![CDATA[check Host exist]]></display-name>
+    <script encoded="false"><![CDATA[var json = System.getModule("com.shuttle.snow").retrieveVMs(hostname)
+if( json.length !== 1){
+    throw("There is more than one host matched with: " + hostname + " on snow.")
+}
+System.log("Found host sys_id on snow. sys_id: " + json[0]['sys_id'])
+hostname_sys_id = json[0]['sys_id']]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding>
+      <bind name="hostname_sys_id" type="string" export-name="hostname_sys_id"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="240.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item4" type="task">
+    <display-name><![CDATA[check App Exist]]></display-name>
+    <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ServiceNow"
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getDiscoveredApplicationList")
+
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+snowQuery = 'u_business_application_id.number=' + appIdString
+
+var data = [snowQuery]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+if(json.result.length !==1){
+    throw("There are more than one application with: " + appIdString)
+}
+System.log("Found application sys_id: " + json.result[0]['sys_id'])
+app_sys_id = json.result[0]['sys_id']]]></script>
+    <in-binding>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+    </in-binding>
+    <out-binding>
+      <bind name="app_sys_id" type="string" export-name="app_sys_id"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="340.0"/>
+  </workflow-item>
+  <workflow-item name="item3" out-name="item5" type="task">
+    <display-name><![CDATA[Generate contents body]]></display-name>
+    <script encoded="false"><![CDATA[function twoDigitDateTime(data) {
+	return (data < 10 ? '0'+data : data)
+}
+
+var d = new Date()
+var current_time  = twoDigitDateTime(d.getDate()) + "/" 
+    current_time += twoDigitDateTime(d.getMonth() + 1) + "/"
+    current_time += d.getFullYear() + " "
+    current_time += twoDigitDateTime(d.getHours()) + ":"
+    current_time += twoDigitDateTime(d.getMinutes()) + ":"
+    current_time += twoDigitDateTime(d.getSeconds())
+
+
+var content_json = {
+    "u_environment": environment,
+    "u_relation_source": "ServiceNow",
+    "u_comments": "ASE Mapping relation added on " + current_time,
+    "type": relation_type_id,
+    "parent": app_sys_id,
+    "child": hostname_sys_id
+}
+content = JSON.stringify(content_json)
+System.debug("Snow post data: ")
+System.debug(content)
+]]></script>
+    <in-binding>
+      <bind name="app_sys_id" type="string" export-name="app_sys_id"/>
+      <bind name="hostname_sys_id" type="string" export-name="hostname_sys_id"/>
+      <bind name="environment" type="string" export-name="environment"/>
+      <bind name="relation_type_id" type="string" export-name="relation_type_id"/>
+    </in-binding>
+    <out-binding>
+      <bind name="content" type="string" export-name="content"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="130.0" x="240.0"/>
+  </workflow-item>
+  <workflow-item name="item4" out-name="item3" type="task">
+    <display-name><![CDATA[Get Relation type sys_id]]></display-name>
+    <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ServiceNow"
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getRelationType")
+
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+var request = restOperation.createRequest(null, null)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+if(json.result.length !==1){
+    throw("There are more than one reloational type")
+}
+System.log("Found application sys_id: " + json.result[0]['sys_id'])
+relation_type_id = json.result[0]['sys_id']]]></script>
+    <in-binding/>
+    <out-binding>
+      <bind name="relation_type_id" type="string" export-name="relation_type_id"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="440.0"/>
+  </workflow-item>
+  <workflow-item name="item5" out-name="item0" type="task">
+    <display-name><![CDATA[Register App Mapping]]></display-name>
+    <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ServiceNow"
+var attributeName = "setApplicationMapping"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, attributeName)
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var request = restOperation.createRequest(null, content)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+System.debug("SNOW request URL: " + request.fullUrl)
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 && statusCode !== 201){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+//var json = JSON.parse(res.contentAsString)
+]]></script>
+    <in-binding>
+      <bind name="content" type="string" export-name="content"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="130.0" x="440.0"/>
+  </workflow-item>
+  <workflow-item name="item6" out-name="item1" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="60.0" x="130.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveVMFolder" result-type="VC:VmFolder" api-version="6.0.0" id="bb418e26-35dc-4405-a377-0b1ed5805929" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="cluster" t="VC:ClusterComputeResource"/>
+  <param n="datacenter" t="string"/>
+  <param n="workload" t="string"/>
+  <param n="projectCodeString" t="string"/>
+  <param n="appIdString" t="string"/>
+  <script encoded="false"><![CDATA[//var datacenter = "acton"
+//var workload = "Linux"
+//var appIdString = "AP000000"
+//var projectCodeString = "P-00000"
+
+System.debug("-------------------------------")
+System.debug("# retrieveVMFolder")
+System.debug("# cluster: " + cluster)
+System.debug("# datacenter: " + datacenter)
+System.debug("# workload: " + workload)
+System.debug("# projectCodeString: " + projectCodeString)
+System.debug("# appIdString: " + appIdString)
+System.debug("#")
+
+var vmFolderName = appIdString.split("|")[0]
+vmFolderName = vmFolderName.replace(/[ ](?=[ ])|[^-_,A-Za-z0-9 ]+/g,'')
+vmFolderName = vmFolderName.replace("/","_")
+
+if (vmFolderName.length > 29 ) {
+	vmFolderName = vmFolderName.substring(1,29)
+}
+
+var projectFolderName = projectCodeString.split("|")[0].replace(/[ ](?=[ ])|[^-_,A-Za-z0-9 ]+/g,'')
+var rootFolder = System.getModule("com.shuttle.utils").retrieveWorkloadRootFolder(cluster, datacenter, workload)
+return System.getModule("com.shuttle.utils").createFolderIfNotExist(rootFolder, projectFolderName, vmFolderName)]]></script>
+</dunes-script-module>

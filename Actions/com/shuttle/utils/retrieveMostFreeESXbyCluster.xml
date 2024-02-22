@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveMostFreeESXbyCluster" result-type="VC:HostSystem" api-version="6.0.0" id="d7f2be70-e58e-4ff1-b198-d206077413c2" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="cluster" t="VC:ClusterComputeResource"/>
+  <script encoded="false"><![CDATA[System.debug("-------------------------------")
+System.debug("# retrieveMostFreeESXbyCluster")
+System.debug("# cluster: " + cluster)
+System.debug("#")
+
+var currentLeastVms = 9999
+
+var esx = null
+for each(var host in cluster.host){
+	var vmNumber = host.vm.length
+	System.debug(host.name + " has " + vmNumber.toString() + " vms on it ")
+	if(host.runtime.inMaintenanceMode){
+		System.debug("Host in maintenance mode: " + host.name)
+	}else if(host.runtime.ConnectionState.value == 'disconnected'){
+		System.debug("Host disconnected: " + host.name)
+	}else if(host.runtime.ConnectionState.value == 'notResponding'){
+		System.debug("Host not responding: " + host.name)
+	}else if(vmNumber == 0){
+		System.warn("Host does not have any VM. Might be entering into MM. So skip this host from selection.")
+	}else if(vmNumber < currentLeastVms){
+		esx = host
+		currentLeastVms = vmNumber
+	}
+}
+if(esx == null){
+	System.error("No valid ESX Hosts found")
+	throw("No valid ESX Hosts found")
+}
+System.log("Selected ESX host to deploy VM: " + esx)
+return esx]]></script>
+</dunes-script-module>

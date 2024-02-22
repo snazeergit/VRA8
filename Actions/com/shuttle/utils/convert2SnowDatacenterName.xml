@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="convert2SnowDatacenterName" result-type="string" api-version="6.0.0" id="0c017196-763d-4140-91b8-702a00255e57" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="datacenter" t="string"/>
+  <script encoded="false"><![CDATA[if(datacenter.match(/^(Acton|FX2_Acton|SRDFUK)$/gi)){
+    return 'COLT Powergate Business Centre'
+}else if(datacenter.match(/^(Welwyn)$/gi)){
+    return 'COLT Welwyn Garden City'
+}else if(datacenter.match(/^(Gurgaon)$/gi)){
+    return 'Gurgaon Building 9'
+}else if(datacenter.match(/^(Noida)$/gi)){
+	return 'Infospace Building 10'
+}else if(datacenter.match(/^(Singapore_Colo1)$/gi)){
+	return 'Equinix SG1';
+}else if(datacenter.match(/^(Singapore_Colo2)$/gi)){
+	return 'Equinix SG2';
+}else if(datacenter.match(/^(Osaka)$/gi)){
+    return 'COLT DC Inzai Building'
+}else if(datacenter.match(/^(Tokyo)$/gi)){
+    return 'Equinix OS1';
+}else if(datacenter.match(/^(HKDC1)$/gi)){
+    return 'HK1 DC - COLT Colo TKO'
+}else if(datacenter.match(/^(HKDC2)$/gi)){
+    return 'HK2 DC'
+}else if(datacenter.match(/^(Toronto)$/gi)){
+	return 'Bell Trinity Square South Tower'
+}else if(datacenter.match(/^(Mississauga)$/gi)){
+	return '1800 Argentia Rd'
+}else{
+	throw ("Invalid location specified:" + location)
+}]]></script>
+</dunes-script-module>

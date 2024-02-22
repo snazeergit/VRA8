@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getSnowOsName" result-type="string" api-version="6.0.0" id="3dbdfbf7-3c81-4ca8-a373-aa31a64741c8" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <script encoded="false"><![CDATA[if(workload === "Linux" || workload === "Oracle"){
+    return "Linux Red Hat"
+}else if(workload === "Windows" || workload === "Sql"){
+    return "Microsoft Windows Server"
+}else if(workload === "Appliance"){
+    return "Linux Red Hat"
+}else{
+    thorw("Could not find SNOW OS name for: " + workload)
+}]]></script>
+</dunes-script-module>

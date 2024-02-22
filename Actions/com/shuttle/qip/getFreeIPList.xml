@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getFreeIPList" result-type="Any" api-version="6.0.0" id="470aeeeb-7f35-49e5-bcab-1e5bbc5a69e7" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.qip">
+  <param n="subnet_address" t="string"/>
+  <script encoded="false"><![CDATA[//var subnet_address = "10.61.152.0"
+
+System.debug("-------------------------------")
+System.debug("# retrieveDistributedPortGroups")
+System.debug("# subnet_address: " + subnet_address)
+System.debug("#")
+
+var categoryPath = "web-root"
+var elementName = "QIP"
+
+var freeIPList = []
+var res = System.getModule("com.shuttle.qip").getListAddress(subnet_address)
+for each(var r in res){
+    if(r.objectClass == "Undefined" && r.objectName.indexOf("shuttle_unused") !== -1){
+        //System.debug(JSON.stringify(r))
+        freeIPList.push(r)
+        if(freeIPList.length > 15){
+            break
+        }
+    }
+}
+System.log("Found " + freeIPList.length + " of IPs on: " + subnet_address)
+
+return freeIPList]]></script>
+</dunes-script-module>

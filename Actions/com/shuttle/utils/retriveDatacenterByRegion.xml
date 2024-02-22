@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retriveDatacenterByRegion" result-type="Array/string" api-version="6.0.0" id="2719c5e4-8b90-454a-9b69-b37dde75513d" version="1.0.3" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="region" t="string"/>
+  <param n="workload" t="string"/>
+  <script encoded="false"><![CDATA[var isLab = System.getModule("com.shuttle.utils").isLab()
+
+if(region === "UK"){
+    if(isLab === true){
+        return ["Welwyn"]
+    }else{
+        //return ["Acton", "FX2_Acton", "SRDFUK", "Welwyn"]
+        return ["Acton", "Welwyn"]
+    }
+}else if(region === "India"){
+    if(workload === "Windows"){
+        return ["Gurgaon", "Noida"]
+    }else{
+        return []
+    }
+}
+// Singapore VxRail sunset at Mar 2024
+// else if(region === "Singapore"){
+//     if(workload === "Windows"){
+//         return ["Equinixsg1", "Equinixsg2"]
+//     }else{
+//         return []
+//     }
+// }
+else if(region === "Japan"){
+    return ["Tokyo","Osaka"]
+}else if(region === "Canada"){
+    if(workload === "Windows"){
+        return ["Toronto", "TR5"]
+    }else{
+        return ["Toronto"]
+    }
+}
+return []]]></script>
+</dunes-script-module>

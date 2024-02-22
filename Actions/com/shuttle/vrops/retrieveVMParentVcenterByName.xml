@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveVMParentVcenterByName" result-type="string" api-version="6.0.0" id="4de12ee9-9387-4fb5-80ec-93757d9c233e" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.vrops">
+  <param n="hostname" t="string"/>
+  <script encoded="false"><![CDATA[System.debug("Finding parentVcenter from VM: " + hostname)
+var r = System.getModule("com.shuttle.vrops").getAllPropertiesByName(hostname)
+for each(var p in r.property){
+    if(p.name == "summary|parentVcenter"){
+        return p.value
+    }
+}
+throw("Could not find parent vCenter va vROps API")]]></script>
+</dunes-script-module>

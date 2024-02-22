@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item1" object-name="workflow:name=generic" id="d9fef017-5c10-4b7a-8849-70cd54a0ffb4" version="1.0.0" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Register SNOW Incident record]]></display-name>
+  <position y="50.0" x="100.0"/>
+  <input>
+    <param name="cmdb_ci" type="string">
+      <description><![CDATA[e.g. ukx11542]]></description>
+    </param>
+    <param name="impact" type="string">
+      <description><![CDATA["Medium" or "Low"]]></description>
+    </param>
+    <param name="urgency" type="string">
+      <description><![CDATA[Critical/High/Medium/Low]]></description>
+    </param>
+    <param name="short_description" type="string"/>
+    <param name="assignment_group" type="string">
+      <description><![CDATA[e.g. fil-cet-platforms-support]]></description>
+    </param>
+    <param name="category" type="string"/>
+    <param name="subcategory" type="string"/>
+    <param name="comments" type="string"/>
+    <param name="u_environment" type="string"/>
+    <param name="caller_id" type="string"/>
+  </input>
+  <output>
+    <param name="inc_name" type="string"/>
+    <param name="sys_id" type="string"/>
+  </output>
+  <attrib name="content" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="580.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item2" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="60.0" x="180.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item3" type="task">
+    <display-name><![CDATA[Generate Content]]></display-name>
+    <script encoded="false"><![CDATA[var impact_list = {
+    "Medium": "3",
+    "Low": "4",
+}
+var urgency_list = {
+    "Critical": "1",
+    "High": "2",
+    "Medium": "3",
+    "Low": "4"
+}
+if(u_environment === "prod"){
+    u_environment = "Production"
+}else if(u_environment === "nonprod"){
+    u_environment = "Non-Production"
+}
+
+var content_json = {
+            "caller_id": caller_id,
+            "cmdb_ci": cmdb_ci,
+            "impact": impact_list[impact],
+            "urgency": urgency_list[urgency],
+            "short_description": short_description,
+            "assignment_group": assignment_group,
+            "category": category,
+            "subcategory": subcategory,
+            "contact_type": "email",
+            "comments": comments,
+            "u_environment": u_environment
+}
+
+content = JSON.stringify(content_json)
+System.debug("Snow post data: " )
+System.debug(content)]]></script>
+    <in-binding>
+      <bind name="assignment_group" type="string" export-name="assignment_group"/>
+      <bind name="category" type="string" export-name="category"/>
+      <bind name="cmdb_ci" type="string" export-name="cmdb_ci"/>
+      <bind name="comments" type="string" export-name="comments"/>
+      <bind name="impact" type="string" export-name="impact"/>
+      <bind name="short_description" type="string" export-name="short_description"/>
+      <bind name="subcategory" type="string" export-name="subcategory"/>
+      <bind name="u_environment" type="string" export-name="u_environment"/>
+      <bind name="urgency" type="string" export-name="urgency"/>
+      <bind name="caller_id" type="string" export-name="caller_id"/>
+    </in-binding>
+    <out-binding>
+      <bind name="content" type="string" export-name="content"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="300.0"/>
+  </workflow-item>
+  <workflow-item name="item3" out-name="item0" type="task">
+    <display-name><![CDATA[Create Incident record]]></display-name>
+    <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ServiceNow"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "registerIncident")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+
+var restOperation = attr.value
+
+var request = restOperation.createRequest(null, content)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+System.debug("SNOW request URL: " + request.fullUrl)
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 && statusCode !== 201){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+sys_id = json.result.sys_id
+inc_name = json.name]]></script>
+    <in-binding>
+      <bind name="content" type="string" export-name="content"/>
+    </in-binding>
+    <out-binding>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+      <bind name="inc_name" type="string" export-name="inc_name"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="420.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

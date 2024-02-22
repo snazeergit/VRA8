@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="subnetMask2cidr" result-type="string" api-version="6.0.0" id="97a961a3-9df1-4903-9249-641b00e3b6cf" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <description><![CDATA[24 to 11111111.11111111.11111111.00000000
+or
+24 to 255.255.255.0]]></description>
+  <param n="subnet_mask" t="string"/>
+  <param n="radix" t="number"/>
+  <script encoded="false"><![CDATA[var bin = ''
+var res = ''
+for(var i=0; i<32; i++){
+    bin += i < subnet_mask ? '1' : '0'
+}
+for(var i=0; i<4; i++){
+    var tmp = parseInt(bin.slice(i*8,(i*8)+8), 2).toString(radix)
+    if(radix === 2){
+        tmp = ('00000000' + tmp).slice(-8)
+    }
+    res += tmp
+    if( i !== 3){ res += '.' }
+}
+System.debug("Subnet Mask: " + subnet_mask + " converted to : " + res)
+return res
+]]></script>
+</dunes-script-module>

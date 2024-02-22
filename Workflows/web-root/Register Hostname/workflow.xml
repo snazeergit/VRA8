@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item2" object-name="workflow:name=generic" id="1ba217b3-d066-4df2-8e1a-e0bd5e273d28" version="1.0.1" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Register Hostname]]></display-name>
+  <position y="50.0" x="100.0"/>
+  <input>
+    <param name="hostname" type="string"/>
+    <param name="domain" type="string"/>
+    <param name="dpg" type="VC:DistributedVirtualPortgroup"/>
+    <param name="ip_address" type="string"/>
+  </input>
+  <output>
+    <param name="subnet_address" type="string"/>
+  </output>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="460.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item0" type="task">
+    <display-name><![CDATA[register ip]]></display-name>
+    <script encoded="false"><![CDATA[subnet_address = System.getModule("com.shuttle.utils").getSubnetAddressByDPG(dpg)
+System.getModule("com.shuttle.qip").registerHostname(ip_address,subnet_address,hostname,domain)]]></script>
+    <in-binding>
+      <bind name="domain" type="string" export-name="domain"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="ip_address" type="string" export-name="ip_address"/>
+    </in-binding>
+    <out-binding>
+      <bind name="subnet_address" type="string" export-name="subnet_address"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="290.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item1" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="60.0" x="180.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

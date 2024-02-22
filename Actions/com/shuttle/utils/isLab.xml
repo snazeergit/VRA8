@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="isLab" result-type="boolean" api-version="6.0.0" id="14dc831c-0a76-4feb-8ff0-ae85ea3a2515" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "Shuttle Environment"
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "isLab")
+if( attr == null){
+    throw("Could not find isLab from configuration.")
+}
+return attr.value]]></script>
+</dunes-script-module>

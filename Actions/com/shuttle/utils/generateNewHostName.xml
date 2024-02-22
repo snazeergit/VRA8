@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="generateNewHostName" result-type="string" api-version="6.0.0" id="0a8956dd-ecc4-47f7-8734-ac08349a864d" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="region" t="string"/>
+  <param n="workload" t="string"/>
+  <script encoded="false"><![CDATA[var hostname = ""
+if(System.getModule("com.shuttle.utils").isLab() == true){
+    region = "LAB"
+}
+
+for(var i=0; i<3; i++){
+    var index = System.getModule("com.shuttle.utils").calcNewHostnameIndex(region, workload)
+    var regionCode = System.getModule("com.shuttle.utils").getShortRegionCode(region)
+
+    if (workload == "Windows" || workload == "Sql") {
+        hostname = regionCode + "FIL" + pad(index,4) + "win"
+    } else if (workload == "Appliance"){
+        hostname = regionCode + pad(index,4) + "va"
+    } else if (workload == "Linux" || workload == "Oracle"){
+        hostname = regionCode.toLowerCase() + "x" + pad(index,4)
+    } else {
+        throw("Could not find Naming conv. Unknown workload: " + workload + ".")
+    }
+
+    var isHostExist = System.getModule("com.shuttle.qip").isHostExist(hostname)
+    var vms = System.getModule("com.shuttle.snow").retrieveVMs(hostname)
+    if(isHostExist === false && vms.length === 0){
+        return hostname
+    }
+}
+
+function pad(num, size) {
+    var s = num+""
+    while (s.length < size) s = "0" + s
+    return s
+}]]></script>
+</dunes-script-module>

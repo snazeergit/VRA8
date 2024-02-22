@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item4" object-name="workflow:name=generic" id="6c496ca8-c4d9-424f-832e-80ffad6aaae9" version="1.0.0" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Register MAC to snow record]]></display-name>
+  <position y="50.0" x="100.0"/>
+  <input>
+    <param name="hostname" type="string"/>
+    <param name="workload" type="string"/>
+    <param name="mac_address" type="string"/>
+    <param name="sys_id" type="string"/>
+    <param name="bios_serial_number" type="string"/>
+  </input>
+  <attrib name="content" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="640.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item2" type="task">
+    <display-name><![CDATA[Generate Content]]></display-name>
+    <script encoded="false"><![CDATA[var content_json = {
+    "mac_address": mac_address,
+    "bios_serial_number": "VMWARE-" + bios_serial_number
+}
+content = JSON.stringify(content_json)
+System.debug("Snow post data: " )
+System.debug(content)
+]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="mac_address" type="string" export-name="mac_address"/>
+      <bind name="bios_serial_number" type="string" export-name="bios_serial_number"/>
+    </in-binding>
+    <out-binding>
+      <bind name="content" type="string" export-name="content"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="320.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item0" type="task">
+    <display-name><![CDATA[Update Asset record]]></display-name>
+    <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ServiceNow"
+var attributeName = ""
+
+if(workload === "Linux" || workload === "Oracle"){
+    attributeName = "updateLinuxAsset"
+}else if(workload === "Appliance"){
+    attributeName = "updateApplianceAsset"
+}else if(workload === "Windows" || workload === "Sql"){
+    attributeName = "updateWindowsAsset"
+}
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, attributeName)
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+if(! sys_id){
+    var hosts = System.getModule("com.shuttle.snow").retrieveVMs(hostname)
+    if(hosts.length !== 1){
+        throw("Could not find sys_id from snow for: " + hostname)
+    }
+    sys_id = hosts[0].sys_id
+}
+
+var request = restOperation.createRequest([sys_id], content)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+System.debug("SNOW request URL: " + request.fullUrl)
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 && statusCode !== 201){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+//var json = JSON.parse(res.contentAsString)
+]]></script>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="content" type="string" export-name="content"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding>
+      <bind name="asset_tag" type="string"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="440.0"/>
+  </workflow-item>
+  <workflow-item name="item4" out-name="item1" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="60.0" x="180.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

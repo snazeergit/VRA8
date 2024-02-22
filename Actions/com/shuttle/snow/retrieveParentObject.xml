@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveParentObject" result-type="string" api-version="6.0.0" id="f4adb1cc-109e-4a93-94b6-a763f0c140c7" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.snow">
+  <param n="sys_id" t="string"/>
+  <param n="u_relation_source" t="string"/>
+  <script encoded="false"><![CDATA[//var sys_id = '8f9ae332dbbb63c0648ef44c0c9619b1'
+//var u_relation_source = "VCenter ESX Host-VM"     // Get parent ESX obj from VM sys_id
+//                        "VCenter Cluster-Host"    // Get parent Cluster obj from ESX sys_id
+//                        "VCenter-Cluster"         // Get parent vCenter obj from Cluster sys_id
+
+var categoryPath = "web-root"
+var elementName = "ServiceNow"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "queryParentRelation")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+
+var restOperation = attr.value
+var fields = [
+            'connection_strength',
+            'parent',
+            'u_relation_source',
+            'type',
+            'sys_id',
+            'child'
+            ]
+
+var data = [sys_id, fields.join(',')]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+for each( var j in json.result ){
+    if( j.u_relation_source == u_relation_source){
+        return j.child.value
+    }
+}
+return null]]></script>
+</dunes-script-module>

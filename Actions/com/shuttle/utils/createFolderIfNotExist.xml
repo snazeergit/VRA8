@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="createFolderIfNotExist" result-type="VC:VmFolder" api-version="6.0.0" id="c42c4ce0-cdc5-4363-b665-63fd79a02848" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="rootFolder" t="VC:VmFolder"/>
+  <param n="projectCode" t="string"/>
+  <param n="vmFolderName" t="string"/>
+  <script encoded="false"><![CDATA[var projectCodeFolder = createFolderifNotExist(rootFolder, projectCode)
+return createFolderifNotExist(projectCodeFolder, vmFolderName)
+
+function createFolderifNotExist(parent, name){
+    for each(var child in parent.childEntity){
+	    if(child.name == name){
+		    System.debug("Folder '" + name + "' already exists under " + parent.name + ".")
+		    return child
+	    }
+    }
+	System.debug("Folder '" + name + "' doesn't exist. Creating ...")
+	return parent.createFolder(name)   
+}]]></script>
+</dunes-script-module>

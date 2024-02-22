@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveActiveAppIds" result-type="Properties" api-version="6.0.0" id="50a686cd-c087-4c7a-a8a2-7e57f705c09a" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="appIdSearchString" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ServiceNow"
+
+if(appIdSearchString == null){
+    return []
+}
+
+//var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getActiveApplications")
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getDiscoveredApplicationList")
+
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var snowQuery = ""
+if ( appIdSearchString.match(/^(AP[\d]{1,6}|AX[\d]{1,6}|TAPP[\d]{1,6}|TSWM[\d]{1,6}|TSWP[\d]{1,6})/gmi) ){
+	//snowQuery = '^asset_tagLIKE' + appIdSearchString
+    snowQuery = 'u_business_application_id.number=' + appIdSearchString
+} else {
+	//snowQuery = '^nameLIKE' + appIdSearchString
+    snowQuery = 'u_business_application_id.nameLIKE' + appIdSearchString
+}
+var data = [snowQuery]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+System.log(res.contentAsString)
+var res = new Properties()
+for(var i=0; i<json.result.length; i++){
+    //res.put(json.result[i]['asset_tag'], json.result[i]['asset_tag'] + " " + json.result[i]['name'])
+    res.put(json.result[i]['u_business_application_id.number'], json.result[i]['u_business_application_id.number'] + " " + json.result[i]['u_business_application_id.name'])
+    System.log(json.result[i]['u_business_application_id.number'] + ":" + json.result[i]['u_business_application_id.number'] + " " + json.result[i]['u_business_application_id.name'])
+}
+
+return res]]></script>
+</dunes-script-module>

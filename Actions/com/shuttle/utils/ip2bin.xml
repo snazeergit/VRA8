@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="ip2bin" result-type="string" api-version="6.0.0" id="08103d23-6eab-4b8c-b412-754ec85477d4" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <description><![CDATA[255.255.255.0 to 11111111.11111111.11111111.00000000]]></description>
+  <param n="ip" t="string"/>
+  <script encoded="false"><![CDATA[var ip_segments = ip.split('.')
+var bin = ''
+for(var i=0; i<ip_segments.length; i++){
+    var num = parseInt(ip_segments[i]).toString(2)
+    bin += ('00000000' + num).slice(-8)
+}
+return bin]]></script>
+</dunes-script-module>

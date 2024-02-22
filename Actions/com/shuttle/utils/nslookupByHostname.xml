@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="nslookupByHostname" result-type="string" api-version="6.0.0" id="376c2a42-1b84-44c1-8493-2e25c4184e22" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="hostname" t="string"/>
+  <script encoded="false"><![CDATA[var domains = [
+    "uk.fid-intl.com",
+    "jp.fid-intl.com",
+    "cn.fid-intl.com",
+    "hk.fid-intl.com",
+    "intl.intlroot.fid-intl.com",
+    "intldev.intldevroot.fid-intl.com"
+]
+
+for(var i=0; i<domains.length; i++){
+    System.debug("Checking ip for " + hostname + "." + domains[i])
+    var ip = System.resolveHostName(hostname + "." + domains[i])
+    if(ip !== null){
+        return ip
+    }
+}
+return null]]></script>
+</dunes-script-module>

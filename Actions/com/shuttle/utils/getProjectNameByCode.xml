@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getProjectNameByCode" result-type="string" api-version="6.0.0" id="1ea23ec4-f635-48e9-bf54-4af317c77f7d" version="0.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="projectCode" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "Project Code"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "database")
+if( attr == null){
+    throw("Could not find database object")
+}
+var db = attr.value
+
+var query = "SELECT"
+    query+= "  INV1.INVESTMENT_ID AS CLARITY_CODE,"
+    query+= "  INV1.INVESTMENT_NAME AS PROJECT_NAME "
+    query+= "FROM"
+    query+= "  PPM_DWH.DWH_INV_INVESTMENT INV1"
+    query+= "    INNER JOIN PPM_DWH.DWH_INV_PROJECT_LN PRJ2"
+    query+= "      ON INV1.INVESTMENT_KEY = PRJ2.INVESTMENT_KEY"
+    query+= "      AND INV1.IS_ACTIVE = 1"
+    query+= "      AND PRJ2.FID_PROJECT_STAGE_2 IN ('Definition', 'Deliver') "
+    query+= "WHERE"
+    query+= "  INV1.INVESTMENT_ID like '"+projectCode+"'"
+
+var records = db.readCustomQuery(query)
+for each(var r in records){
+	return r["PROJECT_NAME"]
+}
+return ""]]></script>
+</dunes-script-module>

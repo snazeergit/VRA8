@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="AddComputerByHost" result-type="string" api-version="6.0.0" id="b2d892e3-c137-4ed0-af3d-de9722fba56e" version="0.0.0" allowed-operations="vfe" category-name="com.shuttle.windows">
+  <param n="hostname" t="string"/>
+  <param n="ou" t="AD:OrganizationalUnit"/>
+  <param n="description" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ARS"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "soapHost")
+if( attr == null){
+    throw("Could not find soapHost object")
+}
+var soapObj = attr.value
+
+var serverPsoId    = "CN="+hostname.toUpperCase()+","+ou.distinguishedName
+var status = false
+
+var operation = soapObj.getOperation("add")
+if (operation == null) {
+    throw "Operation 'add' not found!"
+}
+
+// For debug
+var objInterceptor = new SOAPInterceptor(); 
+    objInterceptor.setRequestBodyInterceptor(requestBodyHandler); 
+	objInterceptor.setResponseBodyInterceptor(responseBodyHandler); 
+
+var request = operation.createSOAPRequest();
+	request.addInParameterAttribute(".","returnData","everything");
+	request.addInParameterAttribute("psoID","ID",serverPsoId);
+	request.addInParameterAttribute("data.attr[0]","name","objectClass");
+	request.setInParameter("data.attr[0].value","computer");
+	request.addInParameterAttribute("data.attr[1]","name","samaccountname");
+	request.setInParameter("data.attr[1].value",hostname.toUpperCase()+"$");
+	request.addInParameterAttribute("data.attr[2]","name","Description");
+	request.setInParameter("data.attr[2].value",description);
+	
+var response = operation.invokeWithInterceptor(request,objInterceptor);
+return status;
+
+// Below are for debuging in case any issue...
+function requestBodyHandler(content) {   
+	System.debug("Soap requestBody is:");    
+    System.debug(content);
+} 
+function responseBodyHandler(content) { 
+	System.debug("Soap responceBody is:");
+    System.debug(content);
+	if(content.match('status="success"')){
+		status = true;
+	}
+}]]></script>
+</dunes-script-module>

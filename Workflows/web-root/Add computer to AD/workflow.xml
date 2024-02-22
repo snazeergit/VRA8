@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item10" object-name="workflow:name=generic" id="9c13c04d-8d23-4756-9be7-76ba619aaa98" version="0.0.2" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Add computer to AD]]></display-name>
+  <position y="37.14285714285714" x="56.19047619047619"/>
+  <input>
+    <param name="hostname" type="string"/>
+    <param name="projectCodeString" type="string"/>
+    <param name="osVersion" type="string"/>
+    <param name="datacenter" type="string"/>
+  </input>
+  <attrib name="ou" type="AD:OrganizationalUnit" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="description" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="isFound" type="boolean" read-only="false">
+    <value encoded="n"><![CDATA[false]]></value>
+  </attrib>
+  <attrib name="counter" type="number" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="err_0" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="actionResult" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="37.14285714285714" x="776.1904761904761"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item2" type="task">
+    <display-name><![CDATA[Preparation]]></display-name>
+    <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ARS"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "defaultOU")
+if( attr == null){
+    throw("Could not find OU object")
+}
+ou = attr.value
+
+
+var projectName = System.getModule("com.shuttle.utils").getProjectNameByCode(projectCodeString)
+
+description = "Project "+projectCodeString+", "+projectName
+description +=". OS = "+osVersion
+description +=". Datacenter "+datacenter
+description +=". VRA Order number "+ workflow.id]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+      <bind name="osVersion" type="string" export-name="osVersion"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+    </in-binding>
+    <out-binding>
+      <bind name="ou" type="AD:OrganizationalUnit" export-name="ou"/>
+      <bind name="description" type="string" export-name="description"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="47.14285714285714" x="216.1904761904762"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item3" type="task" script-module="com.shuttle.windows/AddComputerByHost">
+    <display-name><![CDATA[AddComputerByHost]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.windows").AddComputerByHost(hostname,ou,description);
+]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="ou" type="AD:OrganizationalUnit" export-name="ou"/>
+      <bind name="description" type="string" export-name="description"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="string" export-name="actionResult"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="47.14285714285714" x="336.1904761904762"/>
+  </workflow-item>
+  <workflow-item name="item3" out-name="item5" type="task">
+    <display-name><![CDATA[Lookup Computer]]></display-name>
+    <script encoded="false"><![CDATA[var basePsoID = ou.distinguishedName
+var response = System.getModule("com.shuttle.utils").searchADbyCN(basePsoID, hostname)
+if (response != null){
+	var parameterNames = response.getOutParameters();
+	if (parameterNames.length > 0) {
+		isFound = true
+	}else{
+		isFound = false
+	}
+}else{
+	System.debug("Could not find host( " + computerName + " ) psoID from basePsoID: " + basePsoID);
+	isFound = false
+}
+]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="ou" type="AD:OrganizationalUnit" export-name="ou"/>
+    </in-binding>
+    <out-binding>
+      <bind name="isFound" type="boolean" export-name="isFound"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="47.14285714285714" x="476.19047619047615"/>
+  </workflow-item>
+  <workflow-item name="item5" out-name="item0" type="custom-condition" alt-out-name="item6">
+    <display-name><![CDATA[Found Computer?]]></display-name>
+    <script encoded="false"><![CDATA[return isFound]]></script>
+    <in-binding>
+      <bind name="isFound" type="boolean" export-name="isFound"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Custom decision based on a custom script.]]></description>
+    <position y="37.14285714285714" x="630.4761904761904"/>
+  </workflow-item>
+  <workflow-item name="item6" out-name="item8" type="task">
+    <display-name><![CDATA[Add counter]]></display-name>
+    <script encoded="false"><![CDATA[counter = counter + 1
+System.sleep(5000)]]></script>
+    <in-binding>
+      <bind name="counter" type="number" export-name="counter"/>
+    </in-binding>
+    <out-binding>
+      <bind name="counter" type="number" export-name="counter"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="123.33333333333331" x="630.4761904761904"/>
+  </workflow-item>
+  <workflow-item name="item8" out-name="item9" type="custom-condition" alt-out-name="item3">
+    <display-name><![CDATA[Too many retry?]]></display-name>
+    <script encoded="false"><![CDATA[if(counter > 10){
+    return true
+}
+return false]]></script>
+    <in-binding>
+      <bind name="counter" type="number" export-name="counter"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Custom decision based on a custom script.]]></description>
+    <position y="113.33333333333331" x="478.0952380952381"/>
+  </workflow-item>
+  <workflow-item name="item9" throw-bind-name="err_0" type="end" end-mode="1">
+    <in-binding/>
+    <position y="180.0" x="518.0952380952381"/>
+  </workflow-item>
+  <workflow-item name="item10" out-name="item1" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="47.14285714285714" x="111.42857142857142"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

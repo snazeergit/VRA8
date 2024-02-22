@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="errorNotification" result-type="void" api-version="6.0.0" id="3ceffd46-6ec5-4a74-8137-f988d5ebba81" version="0.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="region" t="string"/>
+  <param n="datacenter" t="string"/>
+  <param n="usedFor" t="string"/>
+  <param n="environment" t="string"/>
+  <param n="workload" t="string"/>
+  <param n="appIdString" t="string"/>
+  <param n="projectCodeString" t="string"/>
+  <param n="error_code" t="string"/>
+  <script encoded="false"><![CDATA[var message = new EmailMessage()
+var content = System.getModule("com.shuttle.email").generateEmailHeader("[Shuttle] Build VM failed")
+
+var userName = System.getContext().getParameter("__metadata_userName")
+// var requestId = System.getContext().getParameter("__metadata_requestId")
+var runid = workflow.id
+
+
+content+="<style type=\"text/css\">"
+content+=".tg  {border-collapse:collapse;border-spacing:0;}"
+content+=".tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}"
+content+=".tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}"
+content+=".tg .tg-fo3p{background-color:#006193;color:#ffffff;text-align:left}"
+content+="</style>"
+
+content+="<table class=\"tg\" style=\"undefined;table-layout: fixed; width: 900px\">"
+content+="<colgroup>"
+content+="<col style=\"width: 50px\">"
+content+="<col style=\"width: 800px\">"
+content+="</colgroup>"
+
+content+="<tr>";
+content+="<th class=\"tg-fo3p\">CustomerName:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + userName + "</th>"
+content+="</tr>"
+
+content+="<tr>";
+content+="<th class=\"tg-fo3p\">Run ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + runid + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Region:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + region + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Datacenter:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + datacenter + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Userd For:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + usedFor + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Environment:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + environment + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Workload:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + workload + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Application ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + appIdString + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Project code ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + projectCodeString + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Error code:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + error_code + "</th>"
+content+="</tr>"
+
+content+="</table>"
+
+content+=System.getModule("com.shuttle.email").generateEmailFutter()
+message.subject = "[Shuttle] Build VM failed"
+message.smtpHost = "mailgateway.uk.fid-intl.com"
+message.smtpPort = "25"
+message.fromName = "Shuttle-build-failed"
+message.fromAddress = "shuttle-noreply@fil.com"
+var emailTo = new Array();
+emailTo.push("alvin.li@fil.com")
+
+var email = System.getModule("com.shuttle.activedirectory").getEmailAddressFromAD(userName.replace("sa","a"))
+if(email !== null){
+	emailTo.push(email)
+}
+
+
+if(emailTo.length != 0){
+	message.toAddress = emailTo.join(',')
+	// message.ccAddress = "alvin.li@fil.com"
+	// message.ccAddress = "FIL-Virtualisation@fil.com"
+}else{
+	// message.toAddress = "alvin.li@fil.com"
+	// message.toAddress = "FIL-Virtualisation@fil.com"
+}
+
+message.addMimePart(content,"text/html; charset=UTF-8")
+message.sendMessage()		]]></script>
+</dunes-script-module>

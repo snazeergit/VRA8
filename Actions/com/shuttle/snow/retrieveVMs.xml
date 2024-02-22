@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveVMs" result-type="string" api-version="6.0.0" id="18681680-e94b-4a4a-ad04-f25111613f5b" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.snow">
+  <param n="hostname" t="string"/>
+  <script encoded="false"><![CDATA[//var hostname = 'ukx11542'
+var categoryPath = "web-root"
+var elementName = "ServiceNow"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "retrieveVMs")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+
+var restOperation = attr.value
+var fields = [
+            'cpu_core_thread',
+            'cpu_core_count',
+            'u_total_cpu_count',
+            'cpu_count',
+            'ram',
+            'disk_space',
+            'os',
+            'u_asset_type',
+            'sys_class_name',
+            'name',
+            'host_name',
+            'dns_domain',
+            'fqdn',
+            'operational_status',
+            'install_status',
+            'support_group',
+            'assignment_group',
+            'sys_created_by',
+            'sys_updated_on',
+            'used_for',
+            'classification',
+            'u_physical_or_virtual',
+            'serial_number',
+            'asset_tag',
+            'sys_id',
+            'location',
+            'cost_center',
+            'last_discovered',
+            'discovery_source'
+            ]
+
+var data = [hostname, fields.join(',')]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+//System.log(res.contentAsString)
+return json.result
+]]></script>
+</dunes-script-module>

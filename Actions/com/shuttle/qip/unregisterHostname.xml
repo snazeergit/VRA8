@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="unregisterHostname" result-type="string" api-version="6.0.0" id="7bc7b538-abed-47d7-a3dc-07b0743b7690" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.qip">
+  <param n="ip_address" t="string"/>
+  <param n="subnet_address" t="string"/>
+  <script encoded="false"><![CDATA[//var subnet_address = "10.166.14.0" or "10.166.14.0/24"
+var categoryPath = "web-root"
+var elementName = "QIP"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "update_v4address")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "user")
+if( attr == null){
+    throw("Could not find QIP username from configuration")
+}
+var user = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "password")
+if( attr == null){
+    throw("Could not find QIP password from configuration")
+}
+var password = attr.value
+
+var content = {
+    "objectAddr": ip_address,
+    "subentAddr": subnet_address.replace(/\/[0-9]+$/,""),
+    "objectName": "shuttle_unused-" + ip_address,
+    "dynamicConfig": "Reserved",
+    "aTTL": "-1",
+    "ptrTTL": "-1",
+    "publishA": "Always",
+    "publishPTR": "Always"
+}
+var request = restOperation.createRequest(null, JSON.stringify(content))
+request.setHeader("Accept", "application/json")
+request.setHeader("Authentication", "Basic "+user+":"+password)
+request.contentType = "application/json"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 ){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+System.log(res.contentAsString)
+//var json = JSON.parse(res.contentAsString)
+//return json.list
+]]></script>
+</dunes-script-module>

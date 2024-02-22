@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveActiveProjectCodes" result-type="Properties" api-version="6.0.0" id="2413571b-75d0-4549-95af-7d6cccfbd74c" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="projectCodeToFind" t="string"/>
+  <script encoded="false"><![CDATA[if(projectCodeToFind == null){
+    return []
+}
+//var projectCodes = new Array()
+projectCodes = new Properties()
+
+var query = "SELECT"
+    query+= "  INV1.INVESTMENT_ID AS CLARITY_CODE,"
+    query+= "  INV1.INVESTMENT_NAME AS PROJECT_NAME "
+    query+= "FROM"
+    query+= "  PPM_DWH.DWH_INV_INVESTMENT INV1"
+    query+= "    INNER JOIN PPM_DWH.DWH_INV_PROJECT_LN PRJ2"
+    query+= "      ON INV1.INVESTMENT_KEY = PRJ2.INVESTMENT_KEY"
+    query+= "      AND INV1.IS_ACTIVE = 1"
+    query+= "      AND PRJ2.FID_PROJECT_STAGE_2 IN ('Definition', 'Deliver')"
+
+var categoryPath = "web-root"
+var elementName = "Project Code"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "database")
+if( attr == null){
+    throw("Could not find database object")
+}
+var db = attr.value
+
+var records = db.readCustomQuery(query)
+for each(var r in records){
+	var strRecord = r["CLARITY_CODE"]+" "+r["PROJECT_NAME"];
+	if(strRecord.toUpperCase().indexOf(projectCodeToFind.toUpperCase()) != -1){
+		//projectCodes.push(r["CLARITY_CODE"] + "|"  + strRecord)
+        projectCodes.put(r["CLARITY_CODE"], strRecord)
+	}
+}
+//System.debug(projectCodes)
+//projectCodes.sort()
+
+return projectCodes]]></script>
+</dunes-script-module>

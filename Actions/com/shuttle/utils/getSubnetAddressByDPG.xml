@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getSubnetAddressByDPG" result-type="string" api-version="6.0.0" id="543195f6-d8fd-4ffc-a0db-1af4cc3fa538" version="1.0.3" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="dpg" t="VC:DistributedVirtualPortgroup"/>
+  <script encoded="false"><![CDATA[var portGroupName = dpg.name.replace(/%2f/g, ".").replace(/\//g, ".").replace(/-/g, ".")
+
+var ipexp = "([0-9]{1,3}.){3}[0-9]{1,3}"
+var netmaskexp = "([1-2][0-9]|3[0-2])"
+var regexp = ipexp + "." + netmaskexp + "$"
+var re = new RegExp(regexp, 'g')
+
+var match = portGroupName.match(re)
+if(match === null){
+    System.warn("Did not find subnet address from port group name: " + dpg.name)
+}
+var subnet_address = match[0].replace(/(.*)\./,"$1/")    // xxx.xxx.xxx.xxx/xx
+return subnet_address]]></script>
+</dunes-script-module>

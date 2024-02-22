@@ -1,0 +1,613 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item5" object-name="workflow:name=generic" id="07351210-168e-404e-82b1-f14798434009" version="1.0.6" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Request a Windows VM]]></display-name>
+  <error-handler name="item14">
+    <position y="220.0" x="60.0"/>
+  </error-handler>
+  <position y="30.0" x="80.0"/>
+  <input>
+    <param name="projectCodeSearchString" type="string"/>
+    <param name="projectCodeString" type="string"/>
+    <param name="appIdSearchString" type="string"/>
+    <param name="appIdString" type="string"/>
+    <param name="usedFor" type="string"/>
+    <param name="environment" type="string"/>
+    <param name="region" type="string"/>
+    <param name="datacenter" type="string"/>
+    <param name="cpu" type="number"/>
+    <param name="memory" type="number"/>
+    <param name="network_address" type="string"/>
+    <param name="workload" type="string"/>
+    <param name="os" type="string"/>
+    <param name="patchDay" type="string"/>
+    <param name="isOtv" type="boolean"/>
+    <param name="backup_network_address" type="string"/>
+  </input>
+  <output>
+    <param name="hostname_out" type="string"/>
+    <param name="inc_name" type="string"/>
+  </output>
+  <attrib name="dpg" type="VC:DistributedVirtualPortgroup" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_dpg" type="VC:DistributedVirtualPortgroup" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="vm_template" type="VC:VirtualMachine" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="customisationSpec" type="Any" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="datastore" type="VC:Datastore" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="host" type="VC:HostSystem" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="vmFolder" type="VC:VmFolder" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="hostname" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="ip_address" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="asset_tag" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="sys_id" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="security_group" type="LdapGroup" read-only="false">
+    <value encoded="n"><![CDATA[intl.intlroot.fid-intl.com\FIL - IMP]]></value>
+  </attrib>
+  <attrib name="security_assignees" type="Array/LdapUser" read-only="false">
+    <value encoded="n"><![CDATA[[]]]></value>
+  </attrib>
+  <attrib name="security_assignee_groups" type="Array/LdapGroup" read-only="false">
+    <value encoded="n"><![CDATA[[43:string#intl.intlroot.fid-intl.com\FIL - IMP,52:string#intl.intlroot.fid-intl.com\FIL-Virtualisation]]]></value>
+  </attrib>
+  <attrib name="timeout_date" type="Date" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="retryPoint" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_ipaddress" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="new_vm" type="VC:VirtualMachine" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="mac_address" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="bios_serial_number" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="domain" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="userName" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="result" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="subnet_address" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_subnet_address" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="errorCode" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_domain" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="error_notice_content" type="Array/string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-note x="48.0" y="203.5" w="654.0" h="91.5" color="FFFFC0">
+    <description><![CDATA[Decom VM when ditected any failure during the build]]></description>
+  </workflow-note>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="140.0" x="440.0"/>
+  </workflow-item>
+  <workflow-item name="item5" out-name="item6" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="40.0" x="160.0"/>
+  </workflow-item>
+  <workflow-item name="item6" out-name="item18" type="link" linked-workflow-id="b3a1cfe1-3eba-4a99-9fdc-7cd6272306a2">
+    <display-name><![CDATA[Map VM Resource]]></display-name>
+    <in-binding>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="environment" type="string" export-name="environment"/>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="os" type="string" export-name="os"/>
+      <bind name="isOtv" type="boolean" export-name="isOtv"/>
+      <bind name="network_address" type="string" export-name="network_address"/>
+      <bind name="backup_network_address" type="string" export-name="backup_network_address"/>
+    </in-binding>
+    <out-binding>
+      <bind name="asset_tag" type="string" export-name="asset_tag"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+      <bind name="hostname_out" type="string" export-name="hostname"/>
+      <bind name="vm_template" type="VC:VirtualMachine" export-name="vm_template"/>
+      <bind name="customisationSpec" type="Any" export-name="customisationSpec"/>
+      <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+      <bind name="host" type="VC:HostSystem" export-name="host"/>
+      <bind name="vmFolder" type="VC:VmFolder" export-name="vmFolder"/>
+      <bind name="ip_address_out" type="string" export-name="ip_address"/>
+      <bind name="backup_ipaddress_out" type="string" export-name="backup_ipaddress"/>
+      <bind name="backup_dpg_out" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="dpg_out" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="domain" type="string" export-name="domain"/>
+      <bind name="subnet_address" type="string" export-name="subnet_address"/>
+      <bind name="backup_subnet_address" type="string" export-name="backup_subnet_address"/>
+      <bind name="inc_name" type="string" export-name="inc_name"/>
+      <bind name="error_notice_content" type="Array/string" export-name="error_notice_content"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="40.0" x="280.0"/>
+  </workflow-item>
+  <workflow-item name="item7" out-name="item8" type="link" linked-workflow-id="abe83971-e064-404a-a4d0-baebcee4aa61">
+    <display-name><![CDATA[Clone Shuttle VM]]></display-name>
+    <in-binding>
+      <bind name="vm_template" type="VC:VirtualMachine" export-name="vm_template"/>
+      <bind name="customisationSpec" type="Any" export-name="customisationSpec"/>
+      <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+      <bind name="host" type="VC:HostSystem" export-name="host"/>
+      <bind name="vmFolder" type="VC:VmFolder" export-name="vmFolder"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="memory" type="number" export-name="memory"/>
+      <bind name="cpu" type="number" export-name="cpu"/>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="subnet_address" type="string" export-name="subnet_address"/>
+      <bind name="backup_subnet_address" type="string" export-name="backup_subnet_address"/>
+      <bind name="primary_ip" type="string" export-name="ip_address"/>
+      <bind name="backup_ip" type="string" export-name="backup_ipaddress"/>
+      <bind name="domain" type="string" export-name="domain"/>
+      <bind name="backup_domain" type="string" export-name="backup_domain"/>
+      <bind name="error_notice_content" type="Array/string" export-name="error_notice_content"/>
+    </in-binding>
+    <out-binding>
+      <bind name="new_vm_out" type="VC:VirtualMachine" export-name="new_vm"/>
+      <bind name="mac_address" type="string" export-name="mac_address"/>
+      <bind name="bios_serial_number" type="string" export-name="bios_serial_number"/>
+      <bind name="inc_name" type="string" export-name="inc_name"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="90.0" x="400.0"/>
+  </workflow-item>
+  <workflow-item name="item8" out-name="item19" type="task">
+    <display-name><![CDATA[Set output]]></display-name>
+    <script encoded="false"><![CDATA[System.log("Server build completed. Host name is:" +hostname)
+hostname_out = hostname
+
+userName = System.getContext().getParameter("__metadata_userName")
+if(userName == null){
+    userName = Server.getRunningUser()
+}
+System.debug("User who is running this workflow is: " + userName)]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding>
+      <bind name="hostname_out" type="string" export-name="hostname_out"/>
+      <bind name="userName" type="string" export-name="userName"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="90.0" x="280.0"/>
+  </workflow-item>
+  <workflow-item name="item9" out-name="item10" type="link" linked-workflow-id="6c496ca8-c4d9-424f-832e-80ffad6aaae9">
+    <display-name><![CDATA[Register MAC to snow record]]></display-name>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="mac_address" type="string" export-name="mac_address"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+      <bind name="bios_serial_number" type="string" export-name="bios_serial_number"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[ ]]></description>
+    <position y="90.0" x="40.0"/>
+  </workflow-item>
+  <workflow-item name="item10" out-name="item11" type="link" linked-workflow-id="28982a2e-cff5-4ae5-8071-39360e06d21c">
+    <display-name><![CDATA[Execute Windows Stack Build]]></display-name>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="patchDay" type="string" export-name="patchDay"/>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+      <bind name="environment" type="string" export-name="environment"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+      <bind name="userName" type="string" export-name="userName"/>
+      <bind name="domain" type="string" export-name="domain"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="order_id" type="string" export-name=""/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="error_notice_content" type="Array/string" export-name="error_notice_content"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[ ]]></description>
+    <position y="150.0" x="40.0"/>
+  </workflow-item>
+  <workflow-item name="item11" out-name="item12" type="link" linked-workflow-id="cca2b95a-ad22-4fb2-8d3e-3ece70d141d5">
+    <display-name><![CDATA[Register Application Mapping on SNOW]]></display-name>
+    <in-binding>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="environment" type="string" export-name="environment"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[ ]]></description>
+    <position y="150.0" x="160.0"/>
+  </workflow-item>
+  <workflow-item name="item12" out-name="item0" type="task">
+    <display-name><![CDATA[Send success Email]]></display-name>
+    <script encoded="false"><![CDATA[var message = new EmailMessage()
+var content = System.getModule("com.shuttle.email").generateEmailHeader("[Shuttle] Request a RHEL VM result")
+var userName = System.getContext().getParameter("__metadata_userName")
+var requestId = System.getContext().getParameter("__metadata_requestId")
+
+content += "<p>Request a Windows VM success and VM deployment completed.</p>"
+
+content+= "<p>This is to inform you VM deployment successfully completed. Please contact to Windows team to have farther assistance  if required.</p>"
+content+="<style type=\"text/css\">"
+content+=".tg  {border-collapse:collapse;border-spacing:0;}"
+content+=".tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}"
+content+=".tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}"
+content+=".tg .tg-fo3p{background-color:#006193;color:#ffffff;text-align:left}"
+content+="</style>"
+
+content+="<table class=\"tg\" style=\"undefined;table-layout: fixed; width: 900px\">"
+content+="<colgroup>"
+content+="<col style=\"width: 50px\">"
+content+="<col style=\"width: 800px\">"
+content+="</colgroup>"
+
+content+="<tr>";
+content+="<th class=\"tg-fo3p\">Username:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + userName + "</th>"
+content+="</tr>"
+
+content+="<tr>";
+content+="<th class=\"tg-fo3p\">Hostname:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + hostname + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">IP Address:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + ip_address + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Backup IP address:</th>";
+content+="<th class=\"tg-031e\"><div align=\"left\">" + backup_ipaddress + "</th>"
+content+="</tr>"
+
+content+="<tr>";
+content+="<th class=\"tg-fo3p\">CPU number:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + cpu.toString() + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Memorzy Size(GB):</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + memory.toString() + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Region:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + region + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Datacenter:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + datacenter + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Userd For:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + usedFor + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Environment:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + environment + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Workload:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + workload + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">SNOW VM sys_id:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + sys_id + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Application ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + appIdString + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Project code ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + projectCodeString + "</th>"
+content+="</tr>"
+
+content+="</table>"
+content+=System.getModule("com.shuttle.email").generateEmailFutter()
+
+
+message.subject = "[Shuttle] Request a Windows VM Completed"
+message.smtpHost = "mailgateway.uk.fid-intl.com"
+message.smtpPort = "25"
+message.fromName = "Shuttle-noreply"
+message.fromAddress = "shuttle-noreply@fil.com"
+var emailTo = new Array();
+emailTo.push("Naotaka.Wada@fil.com")
+
+var email = System.getModule("com.shuttle.activedirectory").getEmailAddressFromAD(userName.replace("sa","a"))
+if(email !== null){
+	emailTo.push(email)
+}
+
+
+if(emailTo.length != 0){
+	message.toAddress = emailTo.join(',')
+	message.ccAddress = "IMP@FILPROD.onmicrosoft.com"
+}else{
+	message.toAddress = "IMP@FILPROD.onmicrosoft.com"
+}
+
+message.addMimePart(content,"text/html; charset=UTF-8")
+message.sendMessage()		
+
+
+
+]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="ip_address" type="string" export-name="ip_address"/>
+      <bind name="backup_ipaddress" type="string" export-name="backup_ipaddress"/>
+      <bind name="cpu" type="number" export-name="cpu"/>
+      <bind name="memory" type="number" export-name="memory"/>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="environment" type="string" export-name="environment"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="150.0" x="280.0"/>
+  </workflow-item>
+  <workflow-item name="item13" type="end" end-mode="0">
+    <in-binding/>
+    <position y="220.0" x="620.0"/>
+  </workflow-item>
+  <workflow-item name="item14" out-name="item15" catch-name="item15" throw-bind-name="errorCode" type="task">
+    <display-name><![CDATA[Delete DNS]]></display-name>
+    <script encoded="false"><![CDATA[try{
+    if(hostname !== null){
+        System.getModule("com.shuttle.qip").deleteDnsEntry(hostname)
+    }
+}catch(e){
+    System.warn("Found error during the DNS removal for hostname but ignoring it.")
+}
+
+try{
+    if(hostname !== null){
+        System.getModule("com.shuttle.qip").deleteDnsEntry(hostname + "-bn1")
+    }
+}catch(e){
+    System.warn("Found error during the DNS removal for bn1 but ignoring it.")
+}
+]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="230.0" x="120.0"/>
+  </workflow-item>
+  <workflow-item name="item15" out-name="item16" throw-bind-name="errorCode" type="task">
+    <display-name><![CDATA[Power off VM and destroy]]></display-name>
+    <script encoded="false"><![CDATA[var vm_obj = null
+if(!new_vm){
+    vm_obj = new_vm
+}else{
+    if(hostname !== null){
+        vm_obj = System.getModule("com.shuttle.utils").retrieveOneVM(hostname)
+    }
+}
+
+if(vm_obj === null){
+    System.log("VM could not found. Skipping to decom.")
+}else{
+    if( vm_obj.runtime.powerState.value === "poweredOff"){
+        System.log("VM is already powered off state. Nothing to do.")
+    }else{
+        System.log("Shutting down VM: " + vm_obj.name)
+        var task = vm_obj.powerOffVM_Task()
+        System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task, true, 5)
+        System.log("Successfully powered off VM.")
+    }
+
+    var task = vm_obj.destroy_Task()
+    System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task, true, 5)
+    System.log("Successfully destroyed VM.")
+}]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="230.0" x="220.0"/>
+  </workflow-item>
+  <workflow-item name="item16" out-name="item17" throw-bind-name="errorCode" type="link" linked-workflow-id="cd5ae01c-657c-4380-b712-b600263a0e78">
+    <display-name><![CDATA[Decom asset record on snow]]></display-name>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[ ]]></description>
+    <position y="230.0" x="360.0"/>
+  </workflow-item>
+  <workflow-item name="item17" out-name="item13" type="task">
+    <display-name><![CDATA[Send failed Email]]></display-name>
+    <script encoded="false"><![CDATA[var message = new EmailMessage()
+var content = System.getModule("com.shuttle.email").generateEmailHeader("[Shuttle] Build RHEL VM failed")
+
+var userName = System.getContext().getParameter("__metadata_userName")
+// var requestId = System.getContext().getParameter("__metadata_requestId")
+var runid = workflow.id
+
+
+content+="<style type=\"text/css\">"
+content+=".tg  {border-collapse:collapse;border-spacing:0;}"
+content+=".tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}"
+content+=".tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}"
+content+=".tg .tg-fo3p{background-color:#006193;color:#ffffff;text-align:left}"
+content+="</style>"
+
+content+="<table class=\"tg\" style=\"undefined;table-layout: fixed; width: 900px\">"
+content+="<colgroup>"
+content+="<col style=\"width: 50px\">"
+content+="<col style=\"width: 800px\">"
+content+="</colgroup>"
+
+content+="<tr>";
+content+="<th class=\"tg-fo3p\">CustomerName:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + userName + "</th>"
+content+="</tr>"
+
+content+="<tr>";
+content+="<th class=\"tg-fo3p\">Run ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + runid + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Region:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + region + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Datacenter:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + datacenter + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Userd For:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + usedFor + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Environment:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + environment + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Workload:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + workload + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Application ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + appIdString + "</th>"
+content+="</tr>"
+
+content+="<tr>"
+content+="<th class=\"tg-fo3p\">Project code ID:</th>"
+content+="<th class=\"tg-031e\"><div align=\"left\">" + projectCodeString + "</th>"
+content+="</tr>"
+
+content+="</table>"
+
+content+=System.getModule("com.shuttle.email").generateEmailFutter()
+message.subject = "[Shuttle] Build RHEL VM failed"
+message.smtpHost = "mailgateway.uk.fid-intl.com"
+message.smtpPort = "25"
+message.fromName = "Shuttle-build-failed"
+message.fromAddress = "shuttle-noreply@fil.com"
+var emailTo = new Array();
+emailTo.push("alvin.li@fil.com")
+
+var email = System.getModule("com.shuttle.activedirectory").getEmailAddressFromAD(userName.replace("sa","a"))
+if(email !== null){
+	emailTo.push(email)
+}
+
+
+if(emailTo.length != 0){
+	message.toAddress = emailTo.join(',')
+	// message.ccAddress = "alvin.li@fil.com"
+	// message.ccAddress = "FIL-Virtualisation@fil.com"
+}else{
+	// message.toAddress = "alvin.li@fil.com"
+	// message.toAddress = "FIL-Virtualisation@fil.com"
+}
+
+message.addMimePart(content,"text/html; charset=UTF-8")
+message.sendMessage()		]]></script>
+    <in-binding>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="environment" type="string" export-name="environment"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="230.0" x="480.0"/>
+  </workflow-item>
+  <workflow-item name="item18" out-name="item7" type="link" linked-workflow-id="9c13c04d-8d23-4756-9be7-76ba619aaa98">
+    <display-name><![CDATA[Add computer to AD]]></display-name>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+      <bind name="osVersion" type="string" export-name="os"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[ ]]></description>
+    <position y="40.0" x="400.0"/>
+  </workflow-item>
+  <workflow-item name="item19" out-name="item9" type="link" linked-workflow-id="e5c035d4-85c9-4872-a01c-80b80cc692de">
+    <display-name><![CDATA[Validate Computer Object on AD]]></display-name>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[ ]]></description>
+    <position y="90.0" x="160.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

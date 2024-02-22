@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="returnDefaultGateway" result-type="string" api-version="6.0.0" id="9867e09b-7aa3-4600-93a8-bb35a5cc159a" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="subnet_address" t="string"><![CDATA[xxx.xxx.xxx.xxx/xx]]></param>
+  <script encoded="false"><![CDATA[System.debug("Start calc default gateway from subnet address: " + subnet_address)
+var nw = subnet_address.split('/')[0]
+var mask = parseInt(subnet_address.split('/')[1])
+System.debug("Network address: " + nw.toString() + " Netmask: " + mask.toString())
+
+var subnet_mask = System.getModule("com.shuttle.utils").subnetMask2cidr(mask, 2)
+subnet_mask = subnet_mask.replace(/\./g,'')
+System.debug("Calculated subnet mask is : " + subnet_mask + ". Decimal: " + parseInt(subnet_mask,2))
+
+var ip_bin = System.getModule("com.shuttle.utils").ip2bin(nw)
+ip_bin = ip_bin.replace(/\./g,'')
+System.debug("ip_bin: " + ip_bin + ". Decimal: " + parseInt(ip_bin,2))
+
+var gw = ( (parseInt(ip_bin,2) & parseInt(subnet_mask,2)) +1).toString(2)
+gw = ('00000000000000000000000000000000' + gw).slice(-32)
+var res = System.getModule("com.shuttle.utils").bin2ip(gw)
+System.debug("Default gateway is: " + res)
+return res
+]]></script>
+</dunes-script-module>

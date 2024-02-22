@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="isHostExist" result-type="boolean" api-version="6.0.0" id="7669b6a5-1e0b-4a4d-ba67-7ee2c2c7c867" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.qip">
+  <param n="hostname" t="string"/>
+  <script encoded="false"><![CDATA[//var hostname = "ukx11542"
+var categoryPath = "web-root"
+var elementName = "QIP"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "searchName")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+System.debug(restOperation)
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "user")
+if( attr == null){
+    throw("Could not find QIP username from configuration")
+}
+user = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "password")
+if( attr == null){
+    throw("Could not find QIP password from configuration")
+}
+password = attr.value
+
+var data = [hostname]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application/json")
+request.setHeader("Authentication", "Basic "+user+":"+password)
+request.contentType = "application/json"
+System.log(request.execute())
+
+var res = request.execute()
+var statusCode = res.statusCode
+// if( statusCode == 404 && res.contentAsString == '{"error":"Not resource record found."}'){
+if( statusCode == 500 && res.contentAsString.search("Cannot find Object") != -1){
+    System.debug(" res.contentAsString is :" + res.contentAsString)
+    System.debug("Could not find :" + hostname + " on QIP via RESET API")
+    return false
+}else if (statusCode == 200){
+    System.debug("Found hostname: " + hostname + " on QIP via REST API")
+    return true
+}else{
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+]]></script>
+</dunes-script-module>

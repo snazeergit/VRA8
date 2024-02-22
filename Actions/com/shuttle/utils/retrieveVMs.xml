@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveVMs" result-type="Array/VC:VirtualMachine" api-version="6.0.0" id="be7c63e7-f61a-4278-bcdd-8a442e5c5d46" version="1.0.2" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="hostname" t="string"/>
+  <param n="vcenter" t="string"/>
+  <script encoded="false"><![CDATA[//var vcenter = ""
+try{
+    vcenter = System.getModule("com.shuttle.vrops").retrieveVMParentVcenterByName(hostname)
+}catch(e){
+    System.warn("Could not find vCenter via vrops API.")
+    vcenter = ""
+}
+if(vcenter === ""){
+    try{
+        var vms = vcenter = System.getModule("com.shuttle.snow").retrieveVMs(hostname)
+        System.debug(vms)
+        if( vms.length > 1){
+            System.warn("More than 2 VMs found via SNOW API.")
+        }else if(vms.length == 0){
+            System.warning("No VM found via SNOW API")
+        }
+        var sys_id = vms[0].sys_id
+        var res = System.getModule("com.shuttle.snow").retrieveVMParentVcenterBySysId(sys_id)
+        System.debug(res)
+        vcenter = res.name
+    }catch(e){
+        System.warn("Could not find vCenter via snow API.")
+        vcenter = ""
+    }
+}
+
+
+System.debug("Current vcenter value is: " + vcenter)
+
+var vm_objs = []
+for each(var vc in Server.findAllForType("VC:SdkConnection")){
+    if(vcenter == "" || vc.name.toLowerCase().indexOf(vcenter.toLowerCase()) !== -1){
+        System.debug("Searching VM on: " + vc.name)
+    	var xpath = "xpath:matches(translate(name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'" + hostname.toLowerCase() +"')"
+        try{
+        	vm_objs = vm_objs.concat(vc.getAllVirtualMachines(null, xpath))
+        }catch(e){
+            System.debug("Error found when searching VM via vCenter API.")
+            System.debug(e)
+        }
+    }else{
+        System.debug("Skiping " + vcenter + " from search.")
+    }
+}
+
+return vm_objs]]></script>
+</dunes-script-module>

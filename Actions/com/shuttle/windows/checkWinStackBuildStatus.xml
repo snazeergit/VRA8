@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="checkWinStackBuildStatus" result-type="string" api-version="6.0.0" id="c7acaa02-b1a5-42ec-82e5-f593817e20b9" version="1.0.2" allowed-operations="vfe" category-name="com.shuttle.windows">
+  <param n="run_id" t="string"/>
+  <script encoded="false"><![CDATA[
+var categoryPath = "web-root"
+var elementName = "Jenkins"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "checkWinStackBuildStatus")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var expire = new Date()
+expire.setMonth(expire.getMinutes() + 180)
+//expire.setMinutes(expire.getMinutes() + 2)
+System.log("Start checking Jenkins run result.")
+var result = null
+var inProgress = null
+while(true){
+    var now = new Date()
+    if(now.getTime() > expire.getTime()){
+        System.error("Jenkins job was not finished within in certain period. Forcelly finishing check.")
+        result = "FAILURE"
+        break
+    }
+    System.sleep(30000)
+    var json = checkStatus(restOperation)
+    result = json.result
+    inProgress = json.inProgress
+    if(result === "FAILURE"){
+        break
+    }
+    if(result === "SUCCESS" && inProgress == false){
+        break
+    }
+}
+
+System.log("Jenkins run result is: " + result)
+return result
+
+
+function checkStatus(restOperation){
+    var request = restOperation.createRequest([run_id], null)
+    request.setHeader("Accept", "application/json")
+    System.debug("Rundeck request URL: " + request.fullUrl)
+
+    var res = request.execute()
+    var statusCode = res.statusCode
+    if( statusCode !== 200 && statusCode !== 201){
+        System.error("Status code is: " + statusCode + ". Here is the content string")
+        System.error(res.contentAsString)
+        throw("Status code error: " + statusCode)
+    }
+    System.debug(res.contentAsString)
+    return JSON.parse(res.contentAsString)
+}]]></script>
+</dunes-script-module>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveDistributedPortGroups" result-type="Array/VC:DistributedVirtualPortgroup" api-version="6.0.0" id="bf190276-535d-4a60-b7a1-ec47bc664901" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="vds" t="VC:VmwareDistributedVirtualSwitch"/>
+  <param n="usedFor" t="string"/>
+  <param n="isOtv" t="boolean"/>
+  <param n="isBackup" t="boolean"/>
+  <script encoded="false"><![CDATA[System.debug("-------------------------------")
+System.debug("# retrieveDistributedPortGroups")
+System.debug("# vds: " + vds)
+System.debug("# usedFor: " + usedFor)
+System.debug("# isOtv: " + isOtv)
+System.debug("# isBackup: " + isBackup)
+System.debug("#")
+System.debug("portGroupToEnumerate - Name: " + vds.name + " ID:" + vds.id)
+
+var vlanexp = ""
+if(isOtv === true){
+	vlanexp = "(OTV_VLAN(_|-)|vRack-DPortGroup-External-OTV-"
+    if(isBackup === true){
+        vlanexp += "BackupVLAN)([0-9]{1,4})"
+    }else{
+        vlanexp += "VLAN1)([0-9]{1,3})"
+    }
+}else{
+    if(isBackup === true){
+        // vlanexp = "(VLAN(_|-)|vRack-DPortGroup-External-Backup-VLAN)([0-9]{1,4})"
+        vlanexp = "((VLAN(_|-)|(vxRail|vRack)|FDC(1|3))-((vXR-PRD-(WIN|UKX))|(DPortGroup-External))(-|_)Backup-VLAN[0-9]{1,4})"
+    }else{
+        // vlanexp = "(VLAN(_|-)|(vRack|vxRail)-DPortGroup-External-VLAN"
+        vlanexp = "((VLAN(_|-)|(vxRail|vRack)|FDC(1|3))-((vXR-PRD-(WIN|UKX))|(DPortGroup-External))(-|_)VLAN"
+        // UK HCI requires distribution of networks based on VLAN id (2xx for prod, 7xx for nonProd)
+        if(usedFor == "prod"){
+	        vlanexp += "[2|3][0-9]{1,3})"
+        } else {
+	        vlanexp += "[3|7])([0-9]{1,3})"
+        }
+    }
+}
+
+var ipexp = "([0-9]{1,3}(.|-)){3}[0-9]{1,3}"
+var netmaskexp = "([2][0-9]|3[0-2])"
+var regexp = "^" + vlanexp + "(_|-)" + ipexp + "((-|\/|%2f)" + netmaskexp + ")?"
+System.debug("Finding all portgroups matching " + regexp)
+
+var re = new RegExp(regexp, 'gi')
+var portGroupList = new Array()
+for each(var pg in vds.portgroup){
+	if(re.test(pg.summary.name.trim())){
+		System.log("***Network: " + (pg.summary.name) + " added to the list of FMN Portgroups")
+		portGroupList.push(pg)
+	} else {
+        //System.debug("*Network: " + (pg.summary.name) + " not added to list of FMN Portgroups - doesn't match regex")
+	}
+}
+
+if(portGroupList.length !== 0){
+	return portGroupList
+} else{
+	throw "No returnedPortgroups were returned by action: retrieveDistributedPortGroups";
+}]]></script>
+</dunes-script-module>

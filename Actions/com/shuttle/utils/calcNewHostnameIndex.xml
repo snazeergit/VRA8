@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="calcNewHostnameIndex" result-type="string" api-version="6.0.0" id="d0515715-b49e-4f74-9d1d-5de0e6921c21" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="region" t="string"/>
+  <param n="workload" t="string"/>
+  <script encoded="false"><![CDATA[var namingConv = ""
+if( System.getModule("com.shuttle.utils").isLab() == true){
+    region = "LAB"
+}
+
+if (workload == "Windows" || workload == "Sql") {
+    namingConv = " 'WIN" + region.toUpperCase() + "FIL'"
+} else if (workload == "Appliance"){
+    namingConv = " 'APPLIANCE" + region + "'"
+} else if (workload == "Linux" || workload == "Oracle"){
+    namingConv = " 'LINUX" + region + "'"
+} else {
+    throw("Could not find Naming conv. Unknown workload: " + workload + ".")
+}
+
+var categoryPath = "web-root"
+var elementName = "VSM"
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "host")
+if( attr == null){
+    throw("Could not find host from configuration.")
+}
+var dbhost = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "password")
+if( attr == null){
+    throw("Could not find password from configuration.")
+}
+var password = attr.value
+
+var main = new JDBCConnection()
+var con = null
+var index = null
+for(var i=0; i<10; i++){
+    try{
+        index = getIndex(dbhost, password)
+        break
+    }catch(e){
+        if(i<2){
+            System.warn("Getting error as: ")
+            System.warn(e)
+        }else{
+            System.error("Could not get Index. Error message: " + e)
+        }
+    }
+    System.debug("Sleeping 30sec...")
+    System.sleep(30*1000)
+}
+
+if(index === null){
+    throw("Could not find hostname index because. This is most likely because MSSQL timed out.")
+}
+return index
+
+function getIndex(dbhost, password){
+    var index = null
+    try  {
+    	con = main.getConnection( dbhost.connectionURL, dbhost.username, password )
+        var statement = "UPDATE VCO_PROVISION_COUNTERS SET PROV_COUNTER = PROV_COUNTER + 1 WHERE PLATFORM = " + namingConv
+	    var stat = con.prepareStatement( statement )
+	    var res = stat.executeUpdate()
+	    stat.close()
+	    if ( res == 1 )  {
+		    System.debug("Table updated in table successfully")
+            statement = "SELECT PROV_COUNTER FROM VCO_PROVISION_COUNTERS WHERE PLATFORM = " + namingConv
+            stat = con.createStatement()
+            res = stat.executeQuery(statement)
+            res.next()
+            index = res.getString("PROV_COUNTER")
+	    } else  {
+		    throw ("Unable to execute [" + statement + "] - please verify that row for region exists in VSM database")
+	    }
+    } catch( ex ) {
+	    throw "Connection to database failed (Reason: " + ex + ")"
+    } finally {
+	    if (con) {
+		    con.close()
+	    }
+    }
+
+    System.log("Index is :" + index)
+    return index
+}]]></script>
+</dunes-script-module>

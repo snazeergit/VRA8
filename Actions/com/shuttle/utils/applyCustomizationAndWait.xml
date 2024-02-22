@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="applyCustomizationAndWait" result-type="boolean" api-version="6.0.0" id="2f17fe80-f818-42c7-b45d-db200b8b4f76" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="vm" t="VC:VirtualMachine"/>
+  <param n="customisationSpec" t="Any"/>
+  <param n="powerOn" t="boolean"/>
+  <script encoded="false"><![CDATA[System.log("Applying customization spec")
+System.debug("-------------------------------")
+System.debug("# applyCustomizationAndWait")
+System.debug("# vm: " + vm)
+System.debug("# powerOn: " + powerOn)
+System.debug("# customizationSpec: ")
+System.debug(customisationSpec)
+System.debug("#")
+
+
+var task = vm.customizeVM_Task(customisationSpec)
+System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task, true, 10)
+
+if(powerOn === false){
+	return true
+}
+
+task = vm.powerOnVM_Task(null)
+System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task, true, 10)
+
+var eventFilter = new VcEventFilterSpec()
+var entityFilter = new VcEventFilterSpecByEntity()
+	entityFilter.entity = vm
+	entityFilter.recursion = VcEventFilterSpecRecursionOption.all
+	eventFilter.entity = entityFilter
+	eventFilter.Type = ["CustomizationSucceeded"]
+
+while(true){
+	var eventManager = vm.sdkConnection.eventManager
+    var events = eventManager.queryEvents(eventFilter)
+    if (events != null){
+	    System.log("Customisation Succeeded. Found the following events: ");
+	    enumerateEvents(events)
+        break
+    } else {
+        System.debug("Still waiting for customization apply complete...")
+        System.sleep(30000)
+    }
+}
+return true
+
+function enumerateEvents(eventIn){
+	for each(var events in eventIn){
+		System.log(events.createdTime + ":" + events.fullFormattedMessage);
+	}
+}]]></script>
+</dunes-script-module>

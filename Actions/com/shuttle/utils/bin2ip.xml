@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="bin2ip" result-type="string" api-version="6.0.0" id="38415574-e02a-4afe-bf16-f76b52cd4e84" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <description><![CDATA[11111111.11111111.11111111.00000000 to 255.255.255.0]]></description>
+  <param n="bin" t="string"/>
+  <script encoded="false"><![CDATA[bin = bin.replace(/\./g,'')
+var res = ''
+for(var i=0; i<4; i++){
+    res += parseInt(bin.slice(i*8,(i*8)+8),2).toString()
+    if( i !== 3){ res += '.' }
+}
+return res]]></script>
+</dunes-script-module>

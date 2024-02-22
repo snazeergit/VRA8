@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveWorkloadRootFolder" result-type="VC:Folder" api-version="6.0.0" id="6dd756eb-3b8f-492b-8170-abc65f0d2b86" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="cluster" t="VC:ClusterComputeResource"/>
+  <param n="datacenter" t="string"/>
+  <param n="workload" t="string"/>
+  <script encoded="false"><![CDATA[//var workload = "Linux"
+//var datacenter = "acton"
+
+var rootFolderName = workload.charAt(0).toUpperCase() + workload.slice(1).toLowerCase()
+xpath = "xpath:name='" + rootFolderName + "'"
+var rootFolders = cluster.sdkConnection.getAllVmFolders(null, xpath)
+if(rootFolders.length == 0){
+    throw("Could not find root folder name: " + rootFolderName + " Under cluster: " + cluster.name)
+}
+
+for each(var folder in rootFolders){
+	var p = folder.parent
+   
+	while(p !== null){
+		if(p.vimType == "Datacenter"){
+            if(p.name.toLowerCase() == datacenter.toLowerCase()){
+			    System.debug("Found vmFolder: " + folder.name + " under valid Datacenter");
+			    return folder
+            } else if(
+                p.name == datacenter + '_Lab' ||
+                p.name == 'LAB_' + datacenter ||
+                p.name == 'vRack-Datacenter' ||
+                p.name == 'vPlex'||
+                p.name == 'Acton' ||
+                p.name == 'Singapore_Colo1' ||
+                p.name == 'Singapore_Colo2' ||
+                p.name == 'Japan_Colo1'||
+                p.name == 'Japan_Colo2' ||
+                p.name == 'Toronto'||
+                p.name == 'Mississauga'
+                ){
+			    System.debug("Found vmFolder ** " + folder.name + " from valid Datacenter name list");
+			    return folder
+		    } else {
+			    System.debug ("Break - got to datacenter level, no match found");
+			    break
+            }
+		}
+		p = p.parent
+	}
+}
+throw("Could not find Workload root folder: " + rootFolderName + " under cluster: " + cluster.name)]]></script>
+</dunes-script-module>

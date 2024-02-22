@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="createLock" result-type="boolean" api-version="6.0.0" id="42e7932d-abd1-498e-a124-77d872dd3feb" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="lockId" t="string"/>
+  <script encoded="false"><![CDATA[var maxRetryNum = 30
+
+var retryCount = 0
+while(true){
+    if(isLockExist() === true){
+        if(maxRetryNum < retryCount){
+            throw("Lock file exist too long and cannot process the resource mapping for VM request.")
+        }
+        System.debug("Lock file exist for: " + lockId + ". Sleeping 30 seconds...")
+        retryCount += 1
+        System.sleep(30 * 1000)  // Sleep 30 seconds
+    }else{
+        System.debug("Lock file is not exist for " + lockId + ". Lets process the resource mapping.")
+        break
+    }
+}
+
+System.debug("Try to lock with lockId:'" + lockId + "' for owner:'vRoAdmin'")
+LockingSystem.lockAndWait( lockId, "vRoAdmin" )
+System.debug("Locked id:'" + lockId + "' for owner:'vRoAdmin'")
+return true
+
+
+function isLockExist(){
+    var locks = LockingSystem.retrieveAll()
+    if(locks != null && locks.length > 0){
+        for(var i in locks){
+            if(locks[i] === lockId + ",vRoAdmin"){
+                return true
+            }
+        }
+    }
+    return false
+}]]></script>
+</dunes-script-module>

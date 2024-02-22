@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getListAddress" result-type="Any" api-version="6.0.0" id="99d0dc69-0cd4-4ea9-a5bf-59010dcab957" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.qip">
+  <param n="subnet_address" t="string"/>
+  <script encoded="false"><![CDATA[//var subnet_address = "10.166.14.0" or "10.166.14.0/24"
+var categoryPath = "web-root"
+var elementName = "QIP"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getListAddress")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "user")
+if( attr == null){
+    throw("Could not find QIP username from configuration")
+}
+user = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "password")
+if( attr == null){
+    throw("Could not find QIP password from configuration")
+}
+password = attr.value
+
+System.debug("Finding list of Address from: " + subnet_address)
+var data = [subnet_address.replace(/\/[0-9]+$/,"")]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application/json")
+request.setHeader("Authentication", "Basic "+user+":"+password)
+request.contentType = "application/json"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 ){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+// System.log(res.contentAsString)
+var json = JSON.parse(res.contentAsString)
+return json.list
+]]></script>
+</dunes-script-module>

@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="acquireToken" result-type="Any" api-version="6.0.0" id="6fd59a1d-a87d-4755-8614-14b926c6f079" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.vrops">
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "vROps"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "acquireToken")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "user")
+if( attr == null){
+    throw("Could not find user from configuration")
+}
+var user = attr.value
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "password")
+if( attr == null){
+    throw("Could not find password from configuration")
+}
+var password = attr.value
+
+var content = {
+            "username": user,
+            "authSource": "INTL",
+            "password": password
+}
+
+var request = restOperation.createRequest(null, JSON.stringify(content))
+request.setHeader("Accept", "application\/json")
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+return json]]></script>
+</dunes-script-module>

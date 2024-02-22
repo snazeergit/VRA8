@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveCustomizationSpec" result-type="Any" api-version="6.0.0" id="21951b08-4b39-4087-ba52-0539258dabb8" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="os" t="string"/>
+  <param n="workload" t="string"/>
+  <param n="cluster" t="VC:ClusterComputeResource"/>
+  <param n="region" t="string"/>
+  <param n="environment" t="string"/>
+  <script encoded="false"><![CDATA[System.debug("-------------------------------")
+System.debug("# retrieveCustomizationSpec")
+System.debug("# workload: " + workload)
+System.debug("# os: " + os)
+System.debug("# cluster: " + cluster)
+System.debug("#")
+
+var chosenWorkload = ""
+if(workload === "Sql" || workload === "Windows"){
+    chosenWorkload = "Windows"
+}else{
+    chosenworkload = "Linux"
+}
+
+var customizationSpecName = chosenWorkload + "-" + os
+var isBackupRequired = System.getModule("com.shuttle.utils").isBackupRequired(region,workload,environment)
+if(isBackupRequired){
+    customizationSpecName += "-BN"
+}
+System.debug("Searching for " + customizationSpecName + " in the attributes");
+
+var csm = cluster.sdkConnection.customizationSpecManager
+if(! csm.doesCustomizationSpecExist(customizationSpecName)){
+    throw("Costomization spec: " + customizationSpecName + " not found on cluster: " +cluster.name)
+}
+var res = csm.getCustomizationSpec(customizationSpecName)
+System.log("Found customization spec.")
+//System.debug("====== Customization Spec =======")
+//System.debug(res)
+//System.debug("====== Customization Spec =======")
+return res.spec
+
+]]></script>
+</dunes-script-module>

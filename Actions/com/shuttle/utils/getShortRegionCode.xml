@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getShortRegionCode" result-type="string" api-version="6.0.0" id="c4511563-26b2-4aed-b868-a484ba06a890" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="region" t="string"/>
+  <script encoded="false"><![CDATA[if( region.toUpperCase() == "UK" ){
+	return ("UK")
+}else if(region.toUpperCase() == "CANADA"){
+	return ("CA")
+}else if(region.toUpperCase() == "LAB"){
+	return ("LAB")
+}else if(region.toUpperCase() == "CHINA"){
+	return ("CN")
+}else if(region.toUpperCase() == "HONG KONG"){
+	return ("HK")
+}else if(region.toUpperCase() == "INDIA"){
+	return ("IN")
+}else if(region.toUpperCase() == "JAPAN"){
+	return ("JP")
+}else if(region.toUpperCase() == "SINGAPORE"){
+	return ("SG")
+}else {
+	throw("Could not convert to short region code. Unknown region: " + region + ".")
+}]]></script>
+</dunes-script-module>

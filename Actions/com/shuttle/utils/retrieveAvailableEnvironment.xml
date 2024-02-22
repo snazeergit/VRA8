@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveAvailableEnvironment" result-type="Array/string" api-version="6.0.0" id="db23fed4-09fd-45f7-9508-85c3336177dc" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="workload" t="string"/>
+  <param n="usedFor" t="string"/>
+  <script encoded="false"><![CDATA[var returnArray = new Array()
+
+if(workload === null || usedFor == null ){
+	return []
+}
+
+if(workload.toLowerCase() === "linux"){
+	if(usedFor.toLowerCase() == "prod"){
+		return ["DR","PROD"]
+	} else {
+		return ["CAT","DEV","EBF","ENG","PERF","QAT","SIT","UAT"]
+	}	
+}else if(workload.toLowerCase() === "windows"){
+	if(usedFor.toLowerCase() == "prod"){
+		return ["DR","PROD"]
+	} else {
+		return ["CAT","DEV","EBF","ENG","PERF","QAT","SIT","UAT"]
+	}
+}else if(workload.toLowerCase() === "sql"){
+	if(usedFor.toLowerCase() == "prod"){
+		return ["PROD"]
+	} else {
+		return ["DEV","EBF","PERF","SIT","UAT"]
+	}
+}else if(workload.toLowerCase() === "oracle"){		
+	if(usedFor.toLowerCase() == "prod"){
+		return ["PROD"]
+	} else {
+		return ["DEV","EBF","PERF","SIT","UAT"]
+	}
+}
+
+return []
+]]></script>
+</dunes-script-module>

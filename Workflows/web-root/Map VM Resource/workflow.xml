@@ -1,0 +1,529 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item1" object-name="workflow:name=generic" id="b3a1cfe1-3eba-4a99-9fdc-7cd6272306a2" version="1.0.7" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Map VM Resource]]></display-name>
+  <error-handler name="item18" throw-bind-name="error_code">
+    <position y="150.0" x="20.0"/>
+  </error-handler>
+  <position y="20.0" x="20.0"/>
+  <input>
+    <param name="projectCodeString" type="string"/>
+    <param name="appIdString" type="string"/>
+    <param name="usedFor" type="string"/>
+    <param name="environment" type="string"/>
+    <param name="region" type="string"/>
+    <param name="datacenter" type="string"/>
+    <param name="workload" type="string"/>
+    <param name="os" type="string"/>
+    <param name="isOtv" type="boolean"/>
+    <param name="network_address" type="string"/>
+    <param name="backup_network_address" type="string"/>
+  </input>
+  <output>
+    <param name="asset_tag" type="string"/>
+    <param name="sys_id" type="string"/>
+    <param name="hostname_out" type="string"/>
+    <param name="vm_template" type="VC:VirtualMachine"/>
+    <param name="customisationSpec" type="Any"/>
+    <param name="datastore" type="VC:Datastore"/>
+    <param name="host" type="VC:HostSystem"/>
+    <param name="vmFolder" type="VC:VmFolder"/>
+    <param name="ip_address_out" type="string"/>
+    <param name="backup_ipaddress_out" type="string"/>
+    <param name="backup_dpg_out" type="VC:DistributedVirtualPortgroup"/>
+    <param name="dpg_out" type="VC:DistributedVirtualPortgroup"/>
+    <param name="domain" type="string"/>
+    <param name="subnet_address" type="string"/>
+    <param name="backup_subnet_address" type="string"/>
+    <param name="inc_name" type="string"/>
+    <param name="error_notice_content" type="Array/string"/>
+  </output>
+  <attrib name="hostname" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="ip_address" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="retryPoint" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="dpg" type="VC:DistributedVirtualPortgroup" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_dpg" type="VC:DistributedVirtualPortgroup" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_hostname" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_domain" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="backup_ipaddress" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="security_group" type="LdapGroup" read-only="false">
+    <value encoded="n"><![CDATA[intl.intlroot.fid-intl.com\FIL-Virtualisation]]></value>
+  </attrib>
+  <attrib name="security_assignees" type="Array/LdapUser" read-only="false">
+    <value encoded="n"><![CDATA[[]]]></value>
+  </attrib>
+  <attrib name="security_assignee_groups" type="Array/LdapGroup" read-only="false">
+    <value encoded="n"><![CDATA[[43:string#intl.intlroot.fid-intl.com\FIL - IMP,52:string#intl.intlroot.fid-intl.com\FIL-Virtualisation]]]></value>
+  </attrib>
+  <attrib name="timeout_date" type="Date" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="error_code" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="impact" type="string" read-only="false">
+    <value encoded="n"><![CDATA[Low]]></value>
+    <description><![CDATA["Medium" or "Low"]]></description>
+  </attrib>
+  <attrib name="urgency" type="string" read-only="false">
+    <value encoded="n"><![CDATA[Low]]></value>
+    <description><![CDATA[Critical/High/Medium/Low]]></description>
+  </attrib>
+  <attrib name="short_description" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="assignment_group" type="string" read-only="false">
+    <value encoded="n"><![CDATA[fIl-virtualisation]]></value>
+    <description><![CDATA[e.g. fil-cet-platforms-support]]></description>
+  </attrib>
+  <attrib name="category" type="string" read-only="false">
+    <value encoded="n"><![CDATA[applications]]></value>
+  </attrib>
+  <attrib name="subcategory" type="string" read-only="false">
+    <value encoded="n"><![CDATA[app failed process]]></value>
+  </attrib>
+  <attrib name="comments" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="caller_id" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="isLocked" type="boolean" read-only="false">
+    <value encoded="n"><![CDATA[false]]></value>
+  </attrib>
+  <attrib name="error_notice" type="Array/string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="lockID" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="220.0" x="960.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item28" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="30.0" x="100.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item29" type="link" linked-workflow-id="f62a0d86-3c74-4d03-910d-9c1f337f55af">
+    <display-name><![CDATA[Map VM Computer Resource]]></display-name>
+    <in-binding>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="os" type="string" export-name="os"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="appId" type="string" export-name="appIdString"/>
+      <bind name="projectCode" type="string" export-name="projectCodeString"/>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="environment" type="string" export-name="environment"/>
+    </in-binding>
+    <out-binding>
+      <bind name="vm_template" type="VC:VirtualMachine" export-name="vm_template"/>
+      <bind name="customisationSpec" type="Any" export-name="customisationSpec"/>
+      <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+      <bind name="host" type="VC:HostSystem" export-name="host"/>
+      <bind name="vmFolder" type="VC:VmFolder" export-name="vmFolder"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="30.0" x="220.0"/>
+  </workflow-item>
+  <workflow-item name="item4" out-name="item5" type="link" linked-workflow-id="bdb8a490-06b8-46f2-a127-409c2fb5e690">
+    <display-name><![CDATA[Map Network Resource]]></display-name>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="isOtv" type="boolean" export-name="isOtv"/>
+      <bind name="network_address" type="string" export-name="network_address"/>
+      <bind name="backup_network_address" type="string" export-name="backup_network_address"/>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="environment" type="string" export-name="environment"/>
+    </in-binding>
+    <out-binding>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="ipaddress" type="string" export-name="ip_address"/>
+      <bind name="backup_ipaddress" type="string" export-name="backup_ipaddress"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="30.0" x="480.0"/>
+  </workflow-item>
+  <workflow-item name="item5" out-name="item13" type="link" linked-workflow-id="d5127151-361d-418d-8982-d21079963e5c">
+    <display-name><![CDATA[Generate and Register Hostname]]></display-name>
+    <in-binding>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="ipaddress" type="string" export-name="ip_address"/>
+    </in-binding>
+    <out-binding>
+      <bind name="hostname_out" type="string" export-name="hostname"/>
+      <bind name="domain_out" type="string" export-name="domain"/>
+      <bind name="subnet_address" type="string" export-name="subnet_address"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="30.0" x="600.0"/>
+  </workflow-item>
+  <workflow-item name="item6" out-name="item7" type="task">
+    <display-name><![CDATA[Unlock]]></display-name>
+    <script encoded="false"><![CDATA[LockingSystem.unlock( datacenter, "vRoAdmin" )
+System.debug( "Unlocked id:'" + datacenter + "' for owner:'vRoAdmin'")]]></script>
+    <in-binding>
+      <bind name="datacenter" type="string" export-name="lockID"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="100.0" x="840.0"/>
+  </workflow-item>
+  <workflow-item name="item7" out-name="item19" type="link" linked-workflow-id="5e7f759a-0672-4eca-adf8-738bc2b5ef7e">
+    <display-name><![CDATA[Register SNOW Asset record]]></display-name>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+    </in-binding>
+    <out-binding>
+      <bind name="asset_tag" type="string" export-name="asset_tag"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="160.0" x="800.0"/>
+  </workflow-item>
+  <workflow-item name="item9" out-name="item10" type="input">
+    <display-name><![CDATA[User interaction]]></display-name>
+    <in-binding>
+      <bind name="security.group" type="LdapGroup" export-name="security_group">
+        <description><![CDATA[Any user member of this group will be authorized to fill in this form.]]></description>
+      </bind>
+      <bind name="security.assignees" type="Array/LdapUser" export-name="security_assignees">
+        <description><![CDATA[Any user from this array of users will be authorized to fill in this form]]></description>
+      </bind>
+      <bind name="security.assignee.groups" type="Array/LdapGroup" export-name="security_assignee_groups">
+        <description><![CDATA[Any user member of any of the groups will be authorized to fill in this form.]]></description>
+      </bind>
+      <bind name="timeout.date" type="Date" export-name="timeout_date">
+        <description><![CDATA[If not null, this input item will wait until date and will continue workflow execution.]]></description>
+      </bind>
+    </in-binding>
+    <out-binding>
+      <bind name="retryPoint" type="string" export-name="retryPoint"/>
+    </out-binding>
+    <presentation/>
+    <description><![CDATA[Use this element to set up a user interaction.]]></description>
+    <position y="160.0" x="540.0"/>
+  </workflow-item>
+  <workflow-item name="item10" type="switch">
+    <display-name><![CDATA[Switch]]></display-name>
+    <script encoded="false"><![CDATA[// Generated by the system, cannot be edited
+if (retryPoint === "Map VM Computer Resource") {
+  return "item16";
+} else if (retryPoint === "Register SNOW Asset record") {
+  return "item7";
+} else if (true) {
+  return "item11";
+}
+]]></script>
+    <in-binding>
+      <bind name="retryPoint" type="string" export-name="retryPoint"/>
+    </in-binding>
+    <out-binding/>
+    <condition name="retryPoint" type="string" comparator="0" label="item16">Map VM Computer Resource</condition>
+    <condition name="retryPoint" type="string" comparator="0" label="item7">Register SNOW Asset record</condition>
+    <condition name="" type="boolean" comparator="6" label="item11"/>
+    <description><![CDATA[Basic switch activity based on a workflow attribute or parameter.]]></description>
+    <position y="160.0" x="660.0"/>
+  </workflow-item>
+  <workflow-item name="item11" throw-bind-name="error_code" type="end" end-mode="1">
+    <in-binding/>
+    <position y="220.0" x="700.0"/>
+  </workflow-item>
+  <workflow-item name="item13" out-name="item14" type="decision-activity" alt-out-name="item6">
+    <display-name><![CDATA[is Backup Required]]></display-name>
+    <script encoded="false"><![CDATA[// Generated by the system, cannot be edited
+return true;]]></script>
+    <in-binding>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="environment" type="string" export-name="environment"/>
+    </in-binding>
+    <out-binding/>
+    <reference type="ScriptModule" id="com.shuttle.utils/isBackupRequired"/>
+    <description><![CDATA[Decision activity based on a workflow or an action.]]></description>
+    <position y="20.0" x="840.0"/>
+  </workflow-item>
+  <workflow-item name="item14" out-name="item15" type="task">
+    <display-name><![CDATA[Generate Backup Hostname]]></display-name>
+    <script encoded="false"><![CDATA[backup_hostname = hostname + "-bn1"
+
+if( System.getModule("com.shuttle.utils").isLab() === true ){
+    backup_domain = "intldev.intldevroot.fid-intl.com"
+}else{
+    backup_domain = "uk.fid-intl.com"
+}]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding>
+      <bind name="backup_hostname" type="string" export-name="backup_hostname"/>
+      <bind name="backup_domain" type="string" export-name="backup_domain"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="100.0" x="600.0"/>
+  </workflow-item>
+  <workflow-item name="item15" out-name="item6" type="link" linked-workflow-id="1ba217b3-d066-4df2-8e1a-e0bd5e273d28">
+    <display-name><![CDATA[Register Hostname]]></display-name>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="backup_hostname"/>
+      <bind name="domain" type="string" export-name="backup_domain"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="ip_address" type="string" export-name="backup_ipaddress"/>
+    </in-binding>
+    <out-binding>
+      <bind name="subnet_address" type="string" export-name="backup_subnet_address"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="100.0" x="720.0"/>
+  </workflow-item>
+  <workflow-item name="item16" out-name="item2" type="task">
+    <display-name><![CDATA[Unregister DNS if Exist]]></display-name>
+    <script encoded="false"><![CDATA[if(hostname === undefined || ip_address === undefined){
+    // Do nothing
+}else{
+    try{
+        var subnet_address = System.getModule("com.shuttle.utils").getSubnetAddressByDPG(dpg)
+        System.getModule("com.shuttle.qip").unregisterHostname(ip_address, subnet_address)
+    }catch(e){
+        System.warn("Failed to unregister DNS but we will ignore this false.")
+    }
+}
+
+if(backup_hostname === undefined || backup_ipaddress === undefined){
+    // Do nothing
+}else{
+    try{
+        var subnet_address = System.getModule("com.shuttle.utils").getSubnetAddressByDPG(backup_dpg)
+        System.getModule("com.shuttle.qip").unregisterHostname(backup_ipaddress, subnet_address)
+    }catch(e){
+        System.warn("Failed to unregister DNS but we will ignore this false.")
+    }
+}]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="backup_hostname" type="string" export-name="backup_hostname"/>
+      <bind name="ip_address" type="string" export-name="ip_address"/>
+      <bind name="backup_ipaddress" type="string" export-name="backup_ipaddress"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="110.0" x="220.0"/>
+  </workflow-item>
+  <workflow-item name="item17" out-name="item25" catch-name="item25" throw-bind-name="error_code" type="link" linked-workflow-id="d9fef017-5c10-4b7a-8849-70cd54a0ffb4">
+    <display-name><![CDATA[Register SNOW Incident record]]></display-name>
+    <in-binding>
+      <bind name="cmdb_ci" type="string" export-name="hostname">
+        <description><![CDATA[e.g. ukx11542]]></description>
+      </bind>
+      <bind name="impact" type="string" export-name="impact">
+        <description><![CDATA["Medium" or "Low"]]></description>
+      </bind>
+      <bind name="urgency" type="string" export-name="urgency">
+        <description><![CDATA[Critical/High/Medium/Low]]></description>
+      </bind>
+      <bind name="short_description" type="string" export-name="short_description"/>
+      <bind name="assignment_group" type="string" export-name="assignment_group">
+        <description><![CDATA[e.g. fil-cet-platforms-support]]></description>
+      </bind>
+      <bind name="category" type="string" export-name="category"/>
+      <bind name="subcategory" type="string" export-name="subcategory"/>
+      <bind name="comments" type="string" export-name="comments"/>
+      <bind name="u_environment" type="string" export-name="usedFor"/>
+      <bind name="caller_id" type="string" export-name="caller_id"/>
+    </in-binding>
+    <out-binding>
+      <bind name="inc_name" type="string" export-name="inc_name"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="160.0" x="420.0"/>
+  </workflow-item>
+  <workflow-item name="item18" out-name="item27" type="task">
+    <display-name><![CDATA[Set Snow post data]]></display-name>
+    <script encoded="false"><![CDATA[caller_id = System.getContext().getParameter("__metadata_userName")
+if(caller_id == null){
+    caller_id = Server.getRunningUser()
+}
+
+short_description = "Shuttle: Map VM Resouce failure detected."
+comments = "There is an error with workflow ID: " + workflow.id + ".n"
+comments += "Parent workflow name is: " + workflow.rootWorkflow.name + ". \n\n"
+comments += "Here is the full error message on vRO.\n"
+comments += error_code
+
+if( isLocked == true ){
+    LockingSystem.unlock( datacenter, "vRoAdmin" )
+    System.debug( "Unlocked id:'" + datacenter + "' for owner:'vRoAdmin'")
+}]]></script>
+    <in-binding>
+      <bind name="error_code" type="string" export-name="error_code"/>
+      <bind name="isLocked" type="boolean" export-name="isLocked"/>
+      <bind name="datacenter" type="string" export-name="lockID"/>
+    </in-binding>
+    <out-binding>
+      <bind name="caller_id" type="string" export-name="caller_id"/>
+      <bind name="comments" type="string" export-name="comments"/>
+      <bind name="short_description" type="string" export-name="short_description"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="160.0" x="100.0"/>
+  </workflow-item>
+  <workflow-item name="item19" out-name="item0" type="task">
+    <display-name><![CDATA[Set output]]></display-name>
+    <script encoded="false"><![CDATA[hostname_out = hostname
+ip_address_out = ip_address
+backup_ipaddress_out = backup_ipaddress
+dpg_out = dpg
+backup_dpg_out = backup_dpg
+
+error_notice_content = error_notice]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+      <bind name="ip_address" type="string" export-name="ip_address"/>
+      <bind name="backup_ipaddress" type="string" export-name="backup_ipaddress"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="error_notice" type="Array/string" export-name="error_notice"/>
+    </in-binding>
+    <out-binding>
+      <bind name="hostname_out" type="string" export-name="hostname_out"/>
+      <bind name="ip_address_out" type="string" export-name="ip_address_out"/>
+      <bind name="backup_ipaddress_out" type="string" export-name="backup_ipaddress_out"/>
+      <bind name="dpg_out" type="VC:DistributedVirtualPortgroup" export-name="dpg_out"/>
+      <bind name="backup_dpg_out" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg_out"/>
+      <bind name="error_notice_content" type="Array/string" export-name="error_notice_content"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="230.0" x="800.0"/>
+  </workflow-item>
+  <workflow-item name="item20" out-name="item4" type="task" script-module="com.shuttle.utils/createLock">
+    <display-name><![CDATA[createLock]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.utils").createLock(lockId);
+]]></script>
+    <in-binding>
+      <bind name="lockId" type="string" export-name="lockID"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="boolean" export-name="isLocked"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="80.0" x="340.0"/>
+  </workflow-item>
+  <workflow-item name="item25" out-name="item26" type="custom-condition" alt-out-name="item9">
+    <display-name><![CDATA[isLinuxBuild]]></display-name>
+    <script encoded="false"><![CDATA[if(workload === "Linux" || workload === "Oracle"){
+    return true
+}
+return false]]></script>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Custom decision based on a custom script.]]></description>
+    <position y="220.0" x="420.0"/>
+  </workflow-item>
+  <workflow-item name="item26" out-name="item11" type="task">
+    <display-name><![CDATA[Set output]]></display-name>
+    <script encoded="false"><![CDATA[hostname_out = hostname]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding>
+      <bind name="hostname_out" type="string" export-name="hostname_out"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="230.0" x="540.0"/>
+  </workflow-item>
+  <workflow-item name="item27" out-name="item17" type="task" script-module="com.shuttle.utils/errorNotification">
+    <display-name><![CDATA[errorNotification]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").errorNotification(region,datacenter,usedFor,environment,workload,appIdString,projectCodeString,error_code);
+]]></script>
+    <in-binding>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="environment" type="string" export-name="environment"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+      <bind name="error_code" type="string" export-name="error_code"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="160.0" x="220.0"/>
+  </workflow-item>
+  <workflow-item name="item28" out-name="item2" type="task">
+    <display-name><![CDATA[set errorNotice content]]></display-name>
+    <script encoded="false"><![CDATA[error_notice = [region,datacenter,usedFor,environment,workload,appIdString,projectCodeString]]]></script>
+    <in-binding>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+      <bind name="environment" type="string" export-name="environment"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="appIdString" type="string" export-name="appIdString"/>
+      <bind name="projectCodeString" type="string" export-name="projectCodeString"/>
+    </in-binding>
+    <out-binding>
+      <bind name="error_notice" type="Array/string" export-name="error_notice"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="80.0" x="100.0"/>
+  </workflow-item>
+  <workflow-item name="item29" out-name="item20" type="task">
+    <display-name><![CDATA[set lockID]]></display-name>
+    <script encoded="false"><![CDATA[if(workload.toUpperCase() == "ORACLE"){
+    if(datacenter == "Acton" || datacenter == "Welwyn"){
+        lockID = "UK"
+    }
+}else{
+    lockID = datacenter
+}
+
+]]></script>
+    <in-binding>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="workload" type="string" export-name="workload"/>
+    </in-binding>
+    <out-binding>
+      <bind name="lockID" type="string" export-name="lockID"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="30.0" x="340.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

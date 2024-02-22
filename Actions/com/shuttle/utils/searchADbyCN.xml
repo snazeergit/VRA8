@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="searchADbyCN" result-type="Any" api-version="6.0.0" id="86013dd4-ca64-4ecb-a6e2-f778dc73fb3a" version="0.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="basePsoID" t="string"/>
+  <param n="key" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ARS"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "soapHost")
+if( attr == null){
+    throw("Could not find soapHost object")
+}
+var soapObj = attr.value
+
+var operation = soapObj.getOperation("search")
+if (operation == null){
+    throw "Operation 'search' not found!"
+}
+
+// For debug
+var objInterceptor = new SOAPInterceptor(); 
+    objInterceptor.setRequestBodyInterceptor(requestBodyHandler)
+	objInterceptor.setResponseBodyInterceptor(responseBodyHandler) 
+
+var request = operation.createSOAPRequest()
+	request.addInParameterAttribute(".","returnData","everything")
+	request.addInParameterAttribute("query","scope","subTree")
+	request.addInParameterAttribute("query.basePsoID","ID",basePsoID)
+	request.addInParameterAttribute("query.filter","xmlns:s4","urn:oasis:names:tc:DSML:2:0:core") // This part is missing on WSDL and need to add manualy
+	request.addInParameterAttribute("query.filter.equalityMatch","name","cn")
+	request.setInParameter("query.filter.equalityMatch.value",key)
+var response = operation.invokeWithInterceptor(request,objInterceptor)
+var parameterNames = response.getOutParameters()
+if (parameterNames.length > 0) {
+	return response
+}else{
+	System.debug("There is no responce from ARS for : " + key)
+}
+
+// Below are for debuging in case any issue...
+function requestBodyHandler(content) {   
+	System.debug("Soap requestBody is:")
+    System.debug(content)
+	System.debug('-----------')
+} 
+function responseBodyHandler(content) { 
+	System.debug("Soap responceBody is:")
+    System.debug(content)
+	System.debug('-----------')
+}]]></script>
+</dunes-script-module>

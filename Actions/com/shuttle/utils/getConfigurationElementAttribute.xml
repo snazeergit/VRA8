@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getConfigurationElementAttribute" result-type="Any" api-version="6.0.0" id="f169cc01-98f8-411b-b6e9-ed2cd4c2554b" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="categoryPath" t="string"/>
+  <param n="elementName" t="string"/>
+  <param n="attributeName" t="string"/>
+  <script encoded="false"><![CDATA[//var categoryPath = "web-root"
+//var attributeName = "isLab"
+//var elementName = "Shuttle Environment"
+
+var category = Server.getConfigurationElementCategoryWithPath(categoryPath)
+if (category == null){
+    throw("Could not find such a category from categoryPath: " + categoryPaht)
+}
+//System.debug("Category(" + categoryPath + ") found. Start checking elements.")
+
+var elem = null
+var elements = category.configurationElements
+for each( var e in elements ){
+    //System.debug("Retrieving elements. Now checking: " + e.name);
+    //System.debug(e.name)
+    if( e.name == elementName ){
+        elem = e
+        break
+    }
+}
+
+if( elem == null ) {
+    throw("Could not find such a a element: " + elementName)
+}
+
+var res = null
+//System.debug("Found attributeName from elemenent: " + elem.name)
+for each ( var a in elem.attributes ){
+    //System.debug( "Retrieving attr: " + a.name )
+    if( a.name == attributeName ) {
+        res = a
+    }
+}
+
+if( res == null ){
+    throw("Could not find attribute: " + attributeName + " from element: " + elem.name)
+}
+System.debug("Found attribute: " + attributeName + " from element: " + elem.name)
+return res]]></script>
+</dunes-script-module>

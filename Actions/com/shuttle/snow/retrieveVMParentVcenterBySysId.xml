@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveVMParentVcenterBySysId" result-type="Any" api-version="6.0.0" id="91256ce7-0533-43ae-8b09-b4becddb7731" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.snow">
+  <param n="sys_id" t="string"/>
+  <script encoded="false"><![CDATA[//var sys_id = "8f9ae332dbbb63c0648ef44c0c9619b1"
+var categoryPath = "web-root"
+var elementName = "ServiceNow"
+
+var esx_sys_id = System.getModule("com.shuttle.snow").retrieveParentObject(sys_id, "VCenter ESX Host-VM")
+var cluster_sys_id = System.getModule("com.shuttle.snow").retrieveParentObject(esx_sys_id, "VCenter Cluster-Host")
+var vcenter_sys_id = System.getModule("com.shuttle.snow").retrieveParentObject(cluster_sys_id, "VCenter-Cluster")
+System.log("vcenter_sys_id is: " + vcenter_sys_id)
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "getAssetInfo")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+
+var restOperation = attr.value
+var fields = [
+            'operational_status',
+            'sys_class_name',
+            'u_active',
+            'asset_tag',
+            'fqdn',
+            'name',
+            'sys_id'
+            ]
+var data = [vcenter_sys_id, fields.join(',')]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+System.debug(res.contentAsString)
+
+var json = JSON.parse(res.contentAsString)
+
+return json.result]]></script>
+</dunes-script-module>

@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="logInputParameters" result-type="void" api-version="6.0.0" id="e117dd6c-ade1-46bb-8298-0f7ea71768cf" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <script encoded="false"><![CDATA[var msg = "\n\n"
+msg += "-##################################################- \n"
+msg += "-# {" + workflow.currentWorkflow.name + "} Inputs: \n"
+msg += "-#  \n"
+
+var params = workflow.getInputParameters()
+if (params == null || params.keys.length == 0) {
+	msg += " | None"
+} else {
+	try{
+		for each (var key in params.keys) {
+            var p = params.get(key)
+			if (p != null) {
+                msg += "-# " + stringifyLog(key, p) + "\n"	
+			} else {
+                msg += "-# " + key + ": null" + "\n"
+			}						
+		}
+	} catch (ex) {
+        System.error("ERROR Enumerating LogInput parameters : " + ex)
+    }
+}
+
+msg += "-# \n"
+msg += "-##################################################- \n"
+System.log(msg)
+
+function getParameterType(name) {
+	var params = workflow.currentWorkflow.inParameters
+	for (var i = 0; i < params.length; i++) {
+		if (params[i].name == name) {
+			return params[i].type
+		}
+	}
+	throw "Unable to find type for input param "+name
+}
+
+function stringifyLog(name, obj) {
+	var log = name
+	var type =  getParameterType(name)
+
+	log += "\t[type = " + type
+	if (type.split(":")[1] == "EventType") {
+		log += ", value : " + obj.value
+	} else if (type.split(":")[0] == "vCloud") {
+		try {
+			if (obj.name != null){
+                log += ", name = " + obj.name
+			    log += ", URL = " + obj.href
+            }
+		}
+		catch(e) {
+			log += "object = " + obj
+		}		
+	} else if (type == "SecureString" || type == "EncryptedString") {
+		log += ", value = ****"
+    } else if (type == "VC:VirtualMachine"){
+        log += ", value = " + obj.name + ", id = " + obj.id + ", vcenter = " + obj.sdkConnection.name
+	} else { 
+		log += ", value = " + obj
+	}
+	log += "]"
+	return log
+}
+
+]]></script>
+</dunes-script-module>

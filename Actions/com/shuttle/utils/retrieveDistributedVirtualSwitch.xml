@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveDistributedVirtualSwitch" result-type="VC:VmwareDistributedVirtualSwitch" api-version="6.0.0" id="74fb0baa-33d0-4123-a9e5-672187a871a7" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="workload" t="string"/>
+  <param n="datacenter" t="string"/>
+  <param n="usedFor" t="string"/>
+  <param n="isBackup" t="boolean"/>
+  <script encoded="false"><![CDATA[//var workload = "Linux"
+//var datacenter = "acton"
+//var usedFor = "nonprod"
+
+System.debug("-------------------------------")
+System.debug("# retrieveDistributedPortGroups")
+System.debug("# workload: " + workload)
+System.debug("# datacenter: " + datacenter)
+System.debug("# isBackup: " + isBackup)
+System.debug("#")
+
+var attrName = workload.toLowerCase() + "-" + datacenter.toLowerCase() + "-" + usedFor.toLowerCase()
+if(isBackup === true){
+    attrName += "-bn"
+}
+
+var categoryPath = "web-root"
+var elementName = "Deployment Target Network"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, attrName)
+if( attr == null){
+    throw("Could not find target Network")
+}
+return attr.value]]></script>
+</dunes-script-module>

@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="generateEmailFutter" result-type="string" api-version="6.0.0" id="df1906c2-2584-47c3-936e-be861dcd63c5" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.email">
+  <script encoded="false"><![CDATA[var content = '<tbody>'
+content += '<tr style="height: 20.0pt;">'
+content += '<td style="width: 3.77064%; background: #cccccc; padding: 0cm; height: 20pt;" width="20"></td>'
+content += '<td style="width: 96.1164%; background: #cccccc; padding: 0cm; height: 20pt;" width="627">'
+content += '<p style="line-height: 16.5pt; margin-right: 0cm; margin-left: 0cm; font-size: 12pt; font-family: \'Times New Roman\', serif;"><span style="font-size: 10.0pt; font-family: \'Arial\',\'sans-serif\'; color: #666666;">If you require any further Technology related information -</span></p>'
+content += '<p style="line-height: 16.5pt; margin-right: 0cm; margin-left: 0cm; font-size: 12pt; font-family: \'Times New Roman\', serif;"><span style="font-size: 10.0pt; font-family: \'Arial\',\'sans-serif\'; color: #666666;">Contact to Global Virtualisation [FIL-Virtualisation@fil.com]]</span></p>'
+content += '</td>'
+content += '</tr>'
+content += '</tbody>'
+content += '</table>'
+
+return content]]></script>
+</dunes-script-module>

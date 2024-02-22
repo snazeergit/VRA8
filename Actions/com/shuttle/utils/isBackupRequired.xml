@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="isBackupRequired" result-type="boolean" api-version="6.0.0" id="5f83d4bc-7c3b-43df-a2f0-e35ef226c53f" version="1.0.2" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="region" t="string"/>
+  <param n="workload" t="string"/>
+  <param n="environment" t="string"/>
+  <script encoded="false"><![CDATA[// Always not backup for non UK environment
+var shortRegionCode = System.getModule("com.shuttle.utils").getShortRegionCode(region)
+if(shortRegionCode != "UK"){
+	return false
+}
+
+// always backup Oracle
+if (workload.toUpperCase() == "ORACLE" || workload.toUpperCase() == "SQL") {
+    System.log("need backup IP")
+	return true
+}
+
+// requester from Oracle svc_ds_automation
+var userName = System.getContext().getParameter("__metadata_userName")
+
+// all other platforms, backup certain environments only
+var baseEnvironment = environment.replace(/[0-9]/g, '').toUpperCase()
+
+if(userName == "svc_ds_automation" && (baseEnvironment == "DEV" || baseEnvironment == "SIT" || baseEnvironment == "QA" || baseEnvironment == "DIT")){
+	System.log("need backup IP")
+    return true
+}
+return false]]></script>
+</dunes-script-module>

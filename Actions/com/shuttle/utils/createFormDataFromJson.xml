@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="createFormDataFromJson" result-type="string" api-version="6.0.0" id="b2e36038-5274-49dd-bacd-0cfea6d0010d" version="1.0.1" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="json_data" t="Any"/>
+  <script encoded="false"><![CDATA[System.debug("-------------------------------")
+System.debug("# createFormDataFromJson")
+System.debug("# json_data: " + json_data)
+System.debug("#")
+
+if(typeof json_data !== "object"){
+    throw("Input variable is not json object")
+}
+
+var url_data = ""
+var keys = Object.keys(json_data)
+for(var i=0; i<keys.length; i++){
+    url_data += keys[i] + "=" + encodeURIComponent(json_data[keys[i]])
+    //url_data += encodeURIComponent(tmp)
+    if(i< keys.length-1){
+        url_data += "&"
+    }
+}
+return url_data]]></script>
+</dunes-script-module>

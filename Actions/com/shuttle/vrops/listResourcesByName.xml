@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="listResourcesByName" result-type="Any" api-version="6.0.0" id="026782c9-4ada-4e0d-8854-f946c0515b5c" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.vrops">
+  <param n="resourcekind" t="string"/>
+  <param n="name" t="string"/>
+  <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "vROps"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, "listResourcesByName")
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+var r = System.getModule("com.shuttle.vrops").acquireToken()
+
+var data = [resourcekind, name]
+var request = restOperation.createRequest(data, null)
+request.setHeader("Accept", "application\/json")
+request.setHeader("Authorization", " vRealizeOpsToken " + r.token)
+request.contentType = "application\/json"
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+var json = JSON.parse(res.contentAsString)
+return json]]></script>
+</dunes-script-module>

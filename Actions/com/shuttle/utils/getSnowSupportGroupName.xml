@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getSnowSupportGroupName" result-type="string" api-version="6.0.0" id="eb215890-30a5-4518-86a4-65f69dff0db7" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="workload" t="string"/>
+  <script encoded="false"><![CDATA[if(workload === "Linux" || workload === "Oracle"){
+    return "fil-unix-servers"
+}else if(workload === "Windows" || workload === "Sql"){
+    return "fil-windows-servers"
+}else if(workload === "Appliance"){
+    return "fIl-virtualisation"
+}else{
+    thorw("Could not find SNOW support group for: " + workload)
+}]]></script>
+</dunes-script-module>

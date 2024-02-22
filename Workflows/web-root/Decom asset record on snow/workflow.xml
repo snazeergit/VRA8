@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item4" object-name="workflow:name=generic" id="cd5ae01c-657c-4380-b712-b600263a0e78" version="1.0.0" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Decom asset record on snow]]></display-name>
+  <position y="50.0" x="100.0"/>
+  <input>
+    <param name="hostname" type="string"/>
+    <param name="workload" type="string"/>
+    <param name="sys_id" type="string"/>
+  </input>
+  <attrib name="content" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="errorCode" type="string" read-only="false">
+    <value encoded="n"><![CDATA[There is no sys_id]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="720.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item2" type="task">
+    <display-name><![CDATA[Generate Content]]></display-name>
+    <script encoded="false"><![CDATA[var content_json = {
+    "install_status": 16,
+    "operational_status": 110, 
+    "u_decommission_date": generateTimeStamp()
+}
+content = JSON.stringify(content_json)
+System.debug("Snow post data: " )
+System.debug(content)
+
+
+function generateTimeStamp(){
+    var now = new Date()
+    var month = to2Digit(now.getMonth() + 1)
+    var d = to2Digit(now.getDate())
+    var year = now.getFullYear()
+    var hours = to2Digit(now.getHours())
+    var minutes = to2Digit(now.getMinutes())
+    var seconds = to2Digit(now.getSeconds())
+    return month + "/" + d + "/" + year + " " + hours + ":" + minutes + ":" + seconds
+}
+
+function to2Digit(data) {
+	return (data < 10 ? '0'+data : data)
+}
+]]></script>
+    <in-binding>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding>
+      <bind name="content" type="string" export-name="content"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="380.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item0" type="task">
+    <display-name><![CDATA[Create Asset record]]></display-name>
+    <script encoded="false"><![CDATA[var categoryPath = "web-root"
+var elementName = "ServiceNow"
+var attributeName = ""
+
+if(workload === "Linux" || workload === "Oracle"){
+    attributeName = "updateLinuxAsset"
+}else if(workload === "Appliance"){
+    attributeName = "updateApplianceAsset"
+}else if(workload === "Windows" || workload === "Sql"){
+    attributeName = "updateWindowsAsset"
+}
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, attributeName)
+if( attr == null){
+    throw("Could not find restOperation object")
+}
+var restOperation = attr.value
+
+var request = restOperation.createRequest([sys_id], content)
+request.setHeader("Accept", "application\/json")
+request.contentType = "application\/json; charset=utf-8"
+System.debug("SNOW request URL: " + request.fullUrl)
+
+var res = request.execute()
+var statusCode = res.statusCode
+if( statusCode !== 200 && statusCode !== 201){
+    System.error("Status code is: " + statusCode + ". Here is the content string")
+    System.error(res.contentAsString)
+    throw("Status code error: " + statusCode)
+}
+
+//var json = JSON.parse(res.contentAsString)
+]]></script>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="content" type="string" export-name="content"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+    </in-binding>
+    <out-binding>
+      <bind name="asset_tag" type="string"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="520.0"/>
+  </workflow-item>
+  <workflow-item name="item4" out-name="item6" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="60.0" x="180.0"/>
+  </workflow-item>
+  <workflow-item name="item6" out-name="item1" type="custom-condition">
+    <display-name><![CDATA[isSysIDExist]]></display-name>
+    <script encoded="false"><![CDATA[if(sys_id !== null){
+    return true
+}
+throw("There is no sys_id.")]]></script>
+    <in-binding>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Custom decision based on a custom script.]]></description>
+    <position y="50.0" x="280.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="deleteDnsEntry" result-type="boolean" api-version="6.0.0" id="c91eede4-2a2f-49f5-acb6-9825e3df2d30" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.qip">
+  <param n="hostname" t="string"/>
+  <script encoded="false"><![CDATA[var ip = System.getModule("com.shuttle.utils").nslookupByHostname(hostname)
+if(ip === null){
+    ip = System.getModule("com.shuttle.qip").getIPaddress(hostname)
+}
+if(ip === null){
+    System.log("No IP address found for " + hostname + ". Skipping DNS deletion.")
+    return false
+}
+
+System.log("IP address for " + hostname + " is " + ip)
+var subnetAddr = System.getModule("com.shuttle.qip").getSubnetAddr(ip)
+System.log("Subnet Address is: " + subnetAddr)
+System.getModule("com.shuttle.qip").unregisterHostname(ip,subnetAddr)
+return true]]></script>
+</dunes-script-module>

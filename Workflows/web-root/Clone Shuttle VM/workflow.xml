@@ -1,0 +1,444 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item16" object-name="workflow:name=generic" id="abe83971-e064-404a-a4d0-baebcee4aa61" version="1.0.6" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Clone Shuttle VM]]></display-name>
+  <error-handler name="item17" throw-bind-name="error_code">
+    <position y="190.0" x="20.0"/>
+  </error-handler>
+  <position y="50.0" x="20.0"/>
+  <input>
+    <param name="vm_template" type="VC:VirtualMachine"/>
+    <param name="customisationSpec" type="Any"/>
+    <param name="datastore" type="VC:Datastore"/>
+    <param name="host" type="VC:HostSystem"/>
+    <param name="vmFolder" type="VC:VmFolder"/>
+    <param name="dpg" type="VC:DistributedVirtualPortgroup"/>
+    <param name="backup_dpg" type="VC:DistributedVirtualPortgroup"/>
+    <param name="memory" type="number"/>
+    <param name="cpu" type="number"/>
+    <param name="hostname" type="string"/>
+    <param name="subnet_address" type="string"/>
+    <param name="backup_subnet_address" type="string"/>
+    <param name="primary_ip" type="string"/>
+    <param name="backup_ip" type="string"/>
+    <param name="domain" type="string"/>
+    <param name="backup_domain" type="string"/>
+    <param name="error_notice_content" type="Array/string"/>
+  </input>
+  <output>
+    <param name="new_vm_out" type="VC:VirtualMachine"/>
+    <param name="mac_address" type="string"/>
+    <param name="bios_serial_number" type="string"/>
+    <param name="inc_name" type="string"/>
+    <param name="sys_id" type="string"/>
+  </output>
+  <attrib name="new_vm" type="VC:VirtualMachine" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="error_code" type="string" read-only="false">
+    <value encoded="n"><![CDATA[Clone failed from some reason.]]></value>
+  </attrib>
+  <attrib name="short_description" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="comments" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="caller_id" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="impact" type="string" read-only="false">
+    <value encoded="n"><![CDATA[Medium]]></value>
+  </attrib>
+  <attrib name="urgency" type="string" read-only="false">
+    <value encoded="n"><![CDATA[Medium]]></value>
+  </attrib>
+  <attrib name="assignment_group" type="string" read-only="false">
+    <value encoded="n"><![CDATA[fil-cet-platforms-support]]></value>
+  </attrib>
+  <attrib name="category" type="string" read-only="false">
+    <value encoded="n"><![CDATA[applications]]></value>
+  </attrib>
+  <attrib name="u_environment" type="string" read-only="false">
+    <value encoded="n"><![CDATA[nonprod]]></value>
+  </attrib>
+  <attrib name="subcategory" type="string" read-only="false">
+    <value encoded="n"><![CDATA[app failed process]]></value>
+  </attrib>
+  <workflow-item name="item1" out-name="item2" type="task">
+    <display-name><![CDATA[Clone VM and Wait]]></display-name>
+    <script encoded="false"><![CDATA[var relocateSpec = System.getModule("com.vmware.library.vc.vm.spec").getRelocateSpec(datastore,null,host,null,null)
+var devices = vm_template.config.hardware.device 
+for(var i in devices){
+    var d = devices[i]
+    if(d.backing !== null && d.backing.fileName !== undefined && d.backing.diskMode !== undefined){
+        var dl = generateDiskLocator(d, datastore)
+        if(relocateSpec.disk === null){
+            relocateSpec.disk = [dl]
+        }else{
+            relocateSpec.disk.push(dl)
+        }
+    }
+}
+
+//var cloneSpec = System.getModule("com.vmware.library.vc.vm.spec").getCloneSpec(customisationSpec,null,relocateSpec,false,false)
+var cloneSpec = System.getModule("com.vmware.library.vc.vm.spec").getCloneSpec(null,null,relocateSpec,false,false)
+var task = vm_template.cloneVM_Task(vmFolder, hostname, cloneSpec)
+new_vm = System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,true,5)
+
+
+new_vm_out = new_vm
+bios_serial_number = new_vm.biosId.toUpperCase()
+bios_serial_number = bios_serial_number.replace(/(\-)/g,"")
+bios_serial_number = bios_serial_number.replace(/(\S{2})/g,"$1 ")
+bios_serial_number = bios_serial_number.replace(/ $/,"")   // remove any trailing space
+
+
+
+function generateDiskLocator(device, ds){
+    var dl = new VcVirtualMachineRelocateSpecDiskLocator()
+    dl.diskBackingInfo = new VcVirtualDiskFlatVer2BackingInfo()
+    dl.diskBackingInfo.eagerlyScrub = true
+    dl.diskBackingInfo.thinProvisioned = true
+    dl.diskBackingInfo.fileName = device.fileName
+    dl.diskBackingInfo.diskMode = device.diskMode
+    dl.datastore = ds
+    dl.diskId = device.key
+    return dl
+}]]></script>
+    <in-binding>
+      <bind name="datastore" type="VC:Datastore" export-name="datastore"/>
+      <bind name="host" type="VC:HostSystem" export-name="host"/>
+      <bind name="vm_template" type="VC:VirtualMachine" export-name="vm_template"/>
+      <bind name="vmFolder" type="VC:VmFolder" export-name="vmFolder"/>
+      <bind name="customisationSpec" type="Any" export-name="customisationSpec"/>
+      <bind name="hostname" type="string" export-name="hostname"/>
+    </in-binding>
+    <out-binding>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+      <bind name="new_vm_out" type="VC:VirtualMachine" export-name="new_vm_out"/>
+      <bind name="bios_serial_number" type="string" export-name="bios_serial_number"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="200.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item4" type="task">
+    <display-name><![CDATA[Connect Primary NIC]]></display-name>
+    <script encoded="false"><![CDATA[System.debug("Trying to connect primary NIC.")
+var nicNumber = 0
+var task = System.getModule("com.vmware.library.vc.networking").connectVmNicNumberToVirtualDistributedPortgroup(
+    new_vm,
+    dpg,
+    nicNumber
+    )
+
+System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,true,5) ]]></script>
+    <in-binding>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="320.0"/>
+  </workflow-item>
+  <workflow-item name="item3" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="1060.0"/>
+  </workflow-item>
+  <workflow-item name="item4" out-name="item6" type="custom-condition" alt-out-name="item7">
+    <display-name><![CDATA[isBackupRequired]]></display-name>
+    <script encoded="false"><![CDATA[if(backup_dpg === null){
+    return false
+}
+return true]]></script>
+    <in-binding>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Custom decision based on a custom script.]]></description>
+    <position y="50.0" x="440.0"/>
+  </workflow-item>
+  <workflow-item name="item5" out-name="item7" type="task">
+    <display-name><![CDATA[Connect Backup NIC]]></display-name>
+    <script encoded="false"><![CDATA[System.debug("Connecting backup NIC on VM.")
+var nicNumber = 1
+var task = System.getModule("com.vmware.library.vc.networking").connectVmNicNumberToVirtualDistributedPortgroup(
+    new_vm,
+    backup_dpg,
+    nicNumber
+    )
+
+System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,true,5) ]]></script>
+    <in-binding>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="140.0" x="580.0"/>
+  </workflow-item>
+  <workflow-item name="item6" out-name="item5" type="task">
+    <display-name><![CDATA[Add NIC]]></display-name>
+    <script encoded="false"><![CDATA[System.debug("Adding virtual NIC on VM for backup interface.")
+var deviceConfigSpec = new VcVirtualDeviceConfigSpec()
+deviceConfigSpec.operation = VcVirtualDeviceConfigSpecOperation.add
+ 
+// Create connect info for dvPortgroup
+var connectInfo = new VcVirtualDeviceConnectInfo()
+connectInfo.allowGuestControl = true
+connectInfo.connected = true
+connectInfo.startConnected = true
+ 
+// Create Network BackingInfo
+var dvsPortConnection = new VcDistributedVirtualSwitchPortConnection()
+var dvSwitch = VcPlugin.convertToVimManagedObject(backup_dpg, backup_dpg.config.distributedVirtualSwitch)
+dvsPortConnection.switchUuid = dvSwitch.uuid
+dvsPortConnection.portgroupKey = backup_dpg.key
+ 
+var netBackingInfo = new VcVirtualEthernetCardDistributedVirtualPortBackingInfo() 
+netBackingInfo.port = dvsPortConnection
+ 
+// Create VirtualNetwork
+var vNetwork = new VcVirtualVmxnet3()
+vNetwork.backing = netBackingInfo
+vNetwork.unitNumber = 0
+vNetwork.addressType = "Generated"
+vNetwork.wakeOnLanEnabled = true
+vNetwork.connectable = connectInfo
+deviceConfigSpec.device = vNetwork
+ 
+// Creating devicespecs configured in vNetwork object
+var deviceConfigSpecs = new Array()
+deviceConfigSpecs[0] = deviceConfigSpec
+ 
+// List of devices
+var configSpec = new VcVirtualMachineConfigSpec()
+configSpec.deviceChange = deviceConfigSpecs
+ 
+// Launch the reconfigVM task
+var task = new_vm.reconfigVM_Task(configSpec)
+System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,true,5) 
+]]></script>
+    <in-binding>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="140.0" x="440.0"/>
+  </workflow-item>
+  <workflow-item name="item7" out-name="item8" type="task">
+    <display-name><![CDATA[Memory Settings]]></display-name>
+    <script encoded="false"><![CDATA[System.debug("Reconfiguring memory setting on VM.")
+var configSpec = new VcVirtualMachineConfigSpec()
+configSpec.memoryMB = memory * 1024
+configSpec.memoryHotAddEnabled = true
+var task = new_vm.reconfigVM_Task(configSpec)
+System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,true,5) ]]></script>
+    <in-binding>
+      <bind name="memory" type="number" export-name="memory"/>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="580.0"/>
+  </workflow-item>
+  <workflow-item name="item8" out-name="item9" type="task">
+    <display-name><![CDATA[CPU Settings]]></display-name>
+    <script encoded="false"><![CDATA[System.debug("Reconfiguraing CPU setting on VM.")
+var numCoresPerSocket = Math.ceil(cpu / 2)
+var configSpec = new VcVirtualMachineConfigSpec()
+configSpec.numCPUs = cpu
+configSpec.numCoresPerSocket = numCoresPerSocket
+configSpec.cpuHotAddEnabled = false
+var task = new_vm.reconfigVM_Task(configSpec)
+System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,true,5) ]]></script>
+    <in-binding>
+      <bind name="cpu" type="number" export-name="cpu"/>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="700.0"/>
+  </workflow-item>
+  <workflow-item name="item9" out-name="item10" type="task">
+    <display-name><![CDATA[Get Primary MAC address]]></display-name>
+    <script encoded="false"><![CDATA[//initialize macAddresses array (to make a push() possible later)  
+var macAddresses = new Array() 
+var deviceArray = new_vm.config.hardware.device
+System.debug(deviceArray)
+
+for (var i in deviceArray) {  
+    var d = deviceArray.pop() 
+    if( d instanceof VcVirtualE1000 ||  
+        d instanceof VcVirtualPCNet32 ||   
+        d instanceof VcVirtualVmxnet ||   
+        d instanceof VcVirtualVmxnet2 ||  
+ 		d instanceof VcVirtualVmxnet3 ||   
+        d instanceof VcVirtualVmxnet) {
+            if (d.deviceInfo.label == "Network adapter 1"){
+                System.debug("found network card on " + d)
+                mac_address = d.macAddress
+                System.debug("Primary MAC is: " + mac_address)
+                break  
+            }  
+
+    }  
+}]]></script>
+    <in-binding>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+    </in-binding>
+    <out-binding>
+      <bind name="mac_address" type="string" export-name="mac_address"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="800.0"/>
+  </workflow-item>
+  <workflow-item name="item10" out-name="item3" type="task">
+    <display-name><![CDATA[Apply customization spec]]></display-name>
+    <script encoded="false"><![CDATA[if(customisationSpec !== null){
+    System.log("Applying customization spec to vm.")
+    var ip_conf = new VcCustomizationFixedIp()
+    ip_conf.ipAddress = primary_ip
+    customisationSpec.nicSettingMap[0].adapter.ip = null
+    customisationSpec.nicSettingMap[0].adapter.ip = ip_conf
+    customisationSpec.nicSettingMap[0].adapter.gateway = [System.getModule("com.shuttle.utils").returnDefaultGateway(subnet_address)]
+    //customisationSpec.nicSettingMap[0].adapter.subnetMask = "255.255.255.0"
+    customisationSpec.nicSettingMap[0].adapter.subnetMask = System.getModule("com.shuttle.utils").subnetMask2cidr(subnet_address.split('/')[1], 10)
+    customisationSpec.nicSettingMap[0].adapter.dnsDomain = domain
+    customisationSpec.nicSettingMap[0].adapter.dnsServerList = ["10.61.192.11","10.61.193.11","10.160.225.51"]
+
+    if(backup_ip){
+        var backup_ip_conf = new VcCustomizationFixedIp()
+        backup_ip_conf.ipAddress = backup_ip
+        customisationSpec.nicSettingMap.push(new VcCustomizationAdapterMapping())
+        customisationSpec.nicSettingMap[1].adapter.ip = null
+        customisationSpec.nicSettingMap[1].adapter.ip = backup_ip_conf
+        customisationSpec.nicSettingMap[1].adapter.gateway = null
+        //customisationSpec.nicSettingMap[1].adapter.subnetMask = backup_subnet_address.split('/')[1]
+        customisationSpec.nicSettingMap[1].adapter.subnetMask = System.getModule("com.shuttle.utils").subnetMask2cidr(backup_subnet_address.split('/')[1], 10)
+        customisationSpec.nicSettingMap[1].adapter.dnsDomain = backup_domain
+    }
+    var dns_conf = new VcCustomizationGlobalIPSettings()
+   	dns_conf.dnsServerList = ["10.61.192.11","10.61.193.11","10.160.225.51"]
+	dns_conf.dnsSuffixList = ["intl.intlroot.fid-intl.com","bip.uk.fid-intl.com","uk.fid-intl.com"]
+    customisationSpec.globalIPSettings = dns_conf
+ 
+    System.getModule("com.shuttle.utils").applyCustomizationAndWait(new_vm, customisationSpec, true)
+}]]></script>
+    <in-binding>
+      <bind name="customisationSpec" type="Any" export-name="customisationSpec"/>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+      <bind name="dpg" type="VC:DistributedVirtualPortgroup" export-name="dpg"/>
+      <bind name="backup_dpg" type="VC:DistributedVirtualPortgroup" export-name="backup_dpg"/>
+      <bind name="primary_ip" type="string" export-name="primary_ip"/>
+      <bind name="backup_ip" type="string" export-name="backup_ip"/>
+      <bind name="subnet_address" type="string" export-name="subnet_address"/>
+      <bind name="backup_subnet_address" type="string" export-name="backup_subnet_address"/>
+      <bind name="domain" type="string" export-name="domain"/>
+      <bind name="backup_domain" type="string" export-name="backup_domain"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="920.0"/>
+  </workflow-item>
+  <workflow-item name="item12" out-name="item13" catch-name="item13" throw-bind-name="error_code" type="task">
+    <display-name><![CDATA[Set output]]></display-name>
+    <script encoded="false"><![CDATA[new_vm_out = new_vm]]></script>
+    <in-binding>
+      <bind name="new_vm" type="VC:VirtualMachine" export-name="new_vm"/>
+    </in-binding>
+    <out-binding>
+      <bind name="new_vm_out" type="VC:VirtualMachine" export-name="new_vm_out"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="200.0" x="500.0"/>
+  </workflow-item>
+  <workflow-item name="item13" throw-bind-name="error_code" type="end" end-mode="1">
+    <in-binding/>
+    <position y="190.0" x="660.0"/>
+  </workflow-item>
+  <workflow-item name="item14" out-name="item15" type="task">
+    <display-name><![CDATA[Set SNOW post data]]></display-name>
+    <script encoded="false"><![CDATA[caller_id = System.getContext().getParameter("__metadata_userName")
+if(caller_id == null){
+    caller_id = Server.getRunningUser()
+}
+
+short_description = "Shuttle: Clone failure detected."
+comments = "There is an error with workflow ID: " + workflow.id + ".n"
+comments += "Parent workflow name is: " + workflow.rootWorkflow.name + ". \n\n"
+comments += "Here is the full error message on vRO.\n"
+comments += error_code
+]]></script>
+    <in-binding>
+      <bind name="error_code" type="string" export-name="error_code"/>
+    </in-binding>
+    <out-binding>
+      <bind name="short_description" type="string" export-name="short_description"/>
+      <bind name="comments" type="string" export-name="comments"/>
+      <bind name="caller_id" type="string" export-name="caller_id"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="200.0" x="260.0"/>
+  </workflow-item>
+  <workflow-item name="item15" out-name="item12" catch-name="item12" throw-bind-name="error_code" type="link" linked-workflow-id="d9fef017-5c10-4b7a-8849-70cd54a0ffb4">
+    <display-name><![CDATA[Register SNOW Incident record]]></display-name>
+    <in-binding>
+      <bind name="cmdb_ci" type="string" export-name="hostname">
+        <description><![CDATA[e.g. ukx11542]]></description>
+      </bind>
+      <bind name="impact" type="string" export-name="impact">
+        <description><![CDATA["Medium" or "Low"]]></description>
+      </bind>
+      <bind name="urgency" type="string" export-name="urgency">
+        <description><![CDATA[Critical/High/Medium/Low]]></description>
+      </bind>
+      <bind name="short_description" type="string" export-name="short_description"/>
+      <bind name="assignment_group" type="string" export-name="assignment_group">
+        <description><![CDATA[e.g. fil-cet-platforms-support]]></description>
+      </bind>
+      <bind name="category" type="string" export-name="category"/>
+      <bind name="subcategory" type="string" export-name="subcategory"/>
+      <bind name="comments" type="string" export-name="comments"/>
+      <bind name="u_environment" type="string" export-name="u_environment"/>
+      <bind name="caller_id" type="string" export-name="caller_id"/>
+    </in-binding>
+    <out-binding>
+      <bind name="inc_name" type="string" export-name="inc_name"/>
+      <bind name="sys_id" type="string" export-name="sys_id"/>
+    </out-binding>
+    <description><![CDATA[ Register INC ticket]]></description>
+    <position y="200.0" x="390.0"/>
+  </workflow-item>
+  <workflow-item name="item16" out-name="item1" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="60.0" x="80.0"/>
+  </workflow-item>
+  <workflow-item name="item17" out-name="item14" type="task">
+    <display-name><![CDATA[send error notice]]></display-name>
+    <script encoded="false"><![CDATA[System.getModule("com.shuttle.utils").errorNotification(
+    error_notice_content[0],
+    error_notice_content[1],
+    error_notice_content[2],
+    error_notice_content[3],
+    error_notice_content[4],
+    error_notice_content[5],
+    error_notice_content[6],
+    error_code
+)]]></script>
+    <in-binding>
+      <bind name="error_notice_content" type="Array/string" export-name="error_notice_content"/>
+      <bind name="error_code" type="string" export-name="error_code"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="200.0" x="100.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

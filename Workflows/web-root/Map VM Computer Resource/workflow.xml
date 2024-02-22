@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item12" object-name="workflow:name=generic" id="f62a0d86-3c74-4d03-910d-9c1f337f55af" version="1.0.2" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Map VM Computer Resource]]></display-name>
+  <position y="30.0" x="60.0"/>
+  <input>
+    <param name="usedFor" type="string"/>
+    <param name="os" type="string"/>
+    <param name="workload" type="string"/>
+    <param name="datacenter" type="string"/>
+    <param name="appId" type="string"/>
+    <param name="projectCode" type="string"/>
+    <param name="region" type="string"/>
+    <param name="environment" type="string"/>
+  </input>
+  <output>
+    <param name="vm_template" type="VC:VirtualMachine"/>
+    <param name="customisationSpec" type="Any"/>
+    <param name="datastore" type="VC:Datastore"/>
+    <param name="host" type="VC:HostSystem"/>
+    <param name="vmFolder" type="VC:VmFolder"/>
+  </output>
+  <attrib name="cluster" type="VC:ClusterComputeResource" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="230.0" x="400.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item3" type="task" script-module="com.shuttle.utils/retrieveCluster">
+    <display-name><![CDATA[retrieveCluster]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.utils").retrieveCluster(workload,datacenter,usedFor);
+]]></script>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="VC:ClusterComputeResource" export-name="cluster"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="40.0" x="240.0"/>
+  </workflow-item>
+  <workflow-item name="item3" out-name="item4" type="task" script-module="com.shuttle.utils/retrieveVMFolder">
+    <display-name><![CDATA[retrieveVMFolder]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.utils").retrieveVMFolder(cluster,datacenter,workload,projectCodeString,appIdString);
+]]></script>
+    <in-binding>
+      <bind name="cluster" type="VC:ClusterComputeResource" export-name="cluster"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="projectCodeString" type="string" export-name="projectCode"/>
+      <bind name="appIdString" type="string" export-name="appId"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="VC:VmFolder" export-name="vmFolder"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="40.0" x="360.0"/>
+  </workflow-item>
+  <workflow-item name="item4" out-name="item5" type="task" script-module="com.shuttle.utils/retrieveMostFreeESXbyCluster">
+    <display-name><![CDATA[retrieveMostFreeESXbyCluster]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.utils").retrieveMostFreeESXbyCluster(cluster);
+]]></script>
+    <in-binding>
+      <bind name="cluster" type="VC:ClusterComputeResource" export-name="cluster"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="VC:HostSystem" export-name="host"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="40.0" x="500.0"/>
+  </workflow-item>
+  <workflow-item name="item5" out-name="item11" type="task" script-module="com.shuttle.utils/retrieveMostFreeDatastorebyHost">
+    <display-name><![CDATA[retrieveMostFreeDatastorebyHost]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.utils").retrieveMostFreeDatastorebyHost(host);
+]]></script>
+    <in-binding>
+      <bind name="host" type="VC:HostSystem" export-name="host"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="VC:Datastore" export-name="datastore"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="100.0" x="120.0"/>
+  </workflow-item>
+  <workflow-item name="item6" out-name="item0" type="task" script-module="com.shuttle.utils/retrieveCustomizationSpec">
+    <display-name><![CDATA[retrieveCustomizationSpec]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.utils").retrieveCustomizationSpec(os,workload,cluster,region,environment);
+]]></script>
+    <in-binding>
+      <bind name="os" type="string" export-name="os"/>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="cluster" type="VC:ClusterComputeResource" export-name="cluster"/>
+      <bind name="region" type="string" export-name="region"/>
+      <bind name="environment" type="string" export-name="environment"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="Any" export-name="customisationSpec"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="170.0" x="360.0"/>
+  </workflow-item>
+  <workflow-item name="item8" out-name="item6" type="custom-condition" alt-out-name="item0">
+    <display-name><![CDATA[if Windows]]></display-name>
+    <script encoded="false"><![CDATA[if(workload == "Windows" || workload == "Sql"){
+    return true
+}else{
+    return false
+}]]></script>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Custom decision based on a custom script.]]></description>
+    <position y="160.0" x="240.0"/>
+  </workflow-item>
+  <workflow-item name="item9" out-name="item8" type="task" script-module="com.shuttle.utils/retrieveVmTemplate">
+    <display-name><![CDATA[retrieveVmTemplate]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.shuttle.utils").retrieveVmTemplate(workload,os,datacenter,usedFor);
+]]></script>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+      <bind name="os" type="string" export-name="os"/>
+      <bind name="datacenter" type="string" export-name="datacenter"/>
+      <bind name="usedFor" type="string" export-name="usedFor"/>
+    </in-binding>
+    <out-binding>
+      <bind name="actionResult" type="VC:VirtualMachine" export-name="vm_template"/>
+    </out-binding>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="170.0" x="120.0"/>
+  </workflow-item>
+  <workflow-item name="item10" type="end" end-mode="0">
+    <in-binding/>
+    <position y="90.0" x="540.0"/>
+  </workflow-item>
+  <workflow-item name="item11" out-name="item10" type="custom-condition" alt-out-name="item9">
+    <display-name><![CDATA[isAppliance]]></display-name>
+    <script encoded="false"><![CDATA[if(workload == "Appliance"){
+    return true
+}else{
+    return false
+}]]></script>
+    <in-binding>
+      <bind name="workload" type="string" export-name="workload"/>
+    </in-binding>
+    <out-binding/>
+    <description><![CDATA[Custom decision based on a custom script.]]></description>
+    <position y="90.0" x="360.0"/>
+  </workflow-item>
+  <workflow-item name="item12" out-name="item2" type="task" script-module="com.shuttle.utils/logInputParameters">
+    <display-name><![CDATA[logInputParameters]]></display-name>
+    <script encoded="false"><![CDATA[//Auto generated script, cannot be modified !
+System.getModule("com.shuttle.utils").logInputParameters();
+]]></script>
+    <in-binding/>
+    <out-binding/>
+    <description><![CDATA[Add a note to the workflow schema.]]></description>
+    <position y="40.0" x="120.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

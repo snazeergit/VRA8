@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="geVMIdentifier" result-type="string" api-version="6.0.0" id="77b34ba6-df1d-4ca5-9b4b-68764258644f" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.vrops">
+  <param n="hostname" t="string"/>
+  <script encoded="false"><![CDATA[var res = System.getModule("com.shuttle.vrops").listResourcesByName("virtualmachine",hostname)
+for each( var r in res.resourceList ){
+    if ( hostname.toLowerCase() == r.resourceKey.name.toLowerCase() ) {
+        return r.identifier
+    }
+}
+
+throw("Could not find hostname match with :" + hostname)]]></script>
+</dunes-script-module>

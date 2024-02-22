@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveCluster" result-type="VC:ClusterComputeResource" api-version="6.0.0" id="a331f29a-b536-488c-b493-c75a911b186b" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="workload" t="string"/>
+  <param n="datacenter" t="string"/>
+  <param n="usedFor" t="string"/>
+  <script encoded="false"><![CDATA[//var workload = "Linux"
+//var datacenter = "acton"
+//var usedFor = "nonprod"
+
+System.debug("-------------------------------")
+System.debug("# retrieveCluster")
+System.debug("# workload: " + workload)
+System.debug("# datacenter: " + datacenter)
+System.debug("# usedFor: " + usedFor)
+System.debug("#")
+
+var attrName = workload.toLowerCase() + "-" + datacenter.toLowerCase() + "-" + usedFor.toLowerCase()
+System.debug("Cluster to find attribute name: " + attrName)
+
+var categoryPath = "web-root"
+var elementName = "Deployment Target Cluster"
+
+var attr = System.getModule("com.shuttle.utils").getConfigurationElementAttribute(categoryPath, elementName, attrName)
+if( attr == null){
+    throw("Could not find target cluster")
+}
+System.log("Found cluster: " + attr.value)
+return attr.value]]></script>
+</dunes-script-module>

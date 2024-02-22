@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="retrieveMostFreeDatastorebyHost" result-type="VC:Datastore" api-version="6.0.0" id="accc1bca-ffa7-4b78-90bf-99c1db2ca260" version="1.0.0" allowed-operations="vfe" category-name="com.shuttle.utils">
+  <param n="host" t="VC:HostSystem"/>
+  <script encoded="false"><![CDATA[System.debug("-------------------------------")
+System.debug("# retrieveMostFreeDatastorebyHost")
+System.debug("# host: " + host)
+System.debug("#")
+
+// Find most free Datastore cluster from host list
+var chosenStoragePod = []
+var storagePods = System.getModule("com.shuttle.utils").retrieveDatastoreClustersByHost(host)
+
+for each(sp in storagePods){
+	if(sp.name.match(/^No_Shuttle_access_/)){
+        continue
+    }
+	if(sp.name.match(/^vsanDatastore$/)){
+		chosenStoragePod = []
+		chosenStoragePod.push(storagePod)
+		break
+	}
+	if(sp.name.match(/^FDC[1|3]_VXRAIL.*vSAN$/)){
+		chosenStoragePod = []
+		chosenStoragePod.push(storagePod)
+		break
+	}
+	else{
+		chosenStoragePod.push(storagePod)
+		System.debug(storagePod.name + " is in list of selection of storagePod.")
+	}
+}
+
+var chosenDatastore = null
+var currentDatastoreWithMostFree = 0
+for each(var ds in host.datastore){
+    //If datastore cluster could not find on chosen ESX then chosenStoragePod will be always null
+    //So following code will be run every time if there is no datastore cluster
+	if(chosenStoragePod.length != 0 && isChildDatastore(ds, chosenStoragePod) == false){
+		continue
+	}
+	if(ds.name.match(/^No_Shuttle_access_/)){
+        continue
+    }
+    if(! (ds.summary.maintenanceMode === "normal" && ds.accessible === true)){
+        continue
+    }
+	if(currentDatastoreWithMostFree < ds.summary.freeSpace){
+		chosenDatastore =  ds
+		currentDatastoreWithMostFree = ds.summary.freeSpace
+	}
+}
+
+System.debug("Datastore with most available space attached to " + host.name + " is : " + chosenDatastore.name)
+return chosenDatastore
+
+//---------------------------------------------------------
+// Functions under here
+//---------------------------------------------------------
+function isChildDatastore(datastore, storagepods){
+	for each(sp in storagepods){
+		for each(var ds in sp.childEntity){
+			if(ds.type == "Datastore" && datastore.id == ds.id){
+				return true
+			}
+		}
+	}
+	return false
+}]]></script>
+</dunes-script-module>
