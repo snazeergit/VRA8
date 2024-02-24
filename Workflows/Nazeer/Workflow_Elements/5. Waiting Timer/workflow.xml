@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="755290fc-ce11-4d16-8ae5-747974af4e2a" editor-version="2.0" version="0.0.1" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>5. Waiting Timer</display-name>
+    <position y="50.0" x="100.0"/>
+    <input/>
+    <output/>
+    <attrib name="timer_date" type="Date">
+        <value encoded="n">20240224024300000+0000</value>
+    </attrib>
+    <attrib name="timeOutOnSignalError" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="520.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("Workflow is about to enter into wait state now at : "+new Date().toLocaleString())&#13;
+System.log("Timer is set to wait till ~"+timer_date+" and will resume post wait time...!")</script>
+        <in-binding>
+            <bind name="timer_date" type="Date" export-name="timer_date"/>
+        </in-binding>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item3" catch-name="item4" throw-bind-name="timeOutOnSignalError" type="waiting-timer" comparator="0">
+        <display-name>Waiting timer</display-name>
+        <script></script>
+        <in-binding>
+            <bind name="timer.date" type="Date" export-name="timer_date">
+                <description>This timer item will wait until date and will continue workflow execution.</description>
+            </bind>
+        </in-binding>
+        <out-binding/>
+        <position y="50.0" x="320.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("Workflow resumed at "+new Date().toLocaleString())</script>
+        <in-binding/>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="400.0"/>
+    </workflow-item>
+    <workflow-item name="item4" throw-bind-name="timeOutOnSignalError" type="end" end-mode="1" business-status="Waiting timer has been set with the past time" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="110.0" x="320.0"/>
+    </workflow-item>
+</ns2:workflow>
