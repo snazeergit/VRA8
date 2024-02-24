@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="e9a08fd5-7df3-4d94-8dec-14e407defcd9" editor-version="2.0" version="0.0.1" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Working with Inputs Outputs and Variables </display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="in1" type="string"/>
+        <param name="in2" type="string"/>
+        <param name="in3" type="string"/>
+        <param name="in4" type="string"/>
+    </input>
+    <output>
+        <param name="out_1" type="string"/>
+    </output>
+    <attrib name="var_1" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <attrib name="var_2" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="520.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("-&gt;"+in1)&#13;
+System.log("-&gt;"+in2)&#13;
+var_1=in1+in2&#13;
+System.log("-&gt;"+var_1)</script>
+        <in-binding>
+            <bind name="in1" type="string" export-name="in1"/>
+            <bind name="in2" type="string" export-name="in2"/>
+        </in-binding>
+        <out-binding>
+            <bind name="var_1" type="string" export-name="var_1"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item3" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("-&gt;"+in3)&#13;
+System.log("-&gt;"+in4)&#13;
+var_2=in3+in4&#13;
+System.log("-&gt;"+var_2)</script>
+        <in-binding>
+            <bind name="in3" type="string" export-name="in3"/>
+            <bind name="in4" type="string" export-name="in4"/>
+        </in-binding>
+        <out-binding>
+            <bind name="var_2" type="string" export-name="var_2"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="280.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("in1-&gt; "+in1)&#13;
+System.log("in3-&gt; "+in3)&#13;
+System.log("var_1-&gt; "+var_1)&#13;
+System.log("var_2-&gt; "+var_2)&#13;
+out_1=var_1+var_2&#13;
+System.log("FINAL OUTPUT: "+out_1)</script>
+        <in-binding>
+            <bind name="in1" type="string" export-name="in1"/>
+            <bind name="in3" type="string" export-name="in3"/>
+            <bind name="var_1" type="string" export-name="var_1"/>
+            <bind name="var_2" type="string" export-name="var_2"/>
+        </in-binding>
+        <out-binding>
+            <bind name="out_1" type="string" export-name="out_1"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="380.0"/>
+    </workflow-item>
+</ns2:workflow>
