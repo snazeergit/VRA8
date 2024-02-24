@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="755290fc-ce11-4d16-8ae5-747974af4e2a" editor-version="2.0" version="0.0.1" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="755290fc-ce11-4d16-8ae5-747974af4e2a" editor-version="2.0" version="0.0.2" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
     <display-name>5. Waiting Timer</display-name>
     <position y="50.0" x="100.0"/>
     <input/>
     <output/>
     <attrib name="timer_date" type="Date">
-        <value encoded="n">20240224024300000+0000</value>
+        <value encoded="n">20240224024600000+0000</value>
     </attrib>
     <attrib name="timeOutOnSignalError" type="string">
         <value encoded="n"></value>
@@ -17,8 +17,15 @@
     </workflow-item>
     <workflow-item name="item1" out-name="item2" type="task" comparator="0">
         <display-name>Scriptable task</display-name>
-        <script encoded="false">System.log("Workflow is about to enter into wait state now at : "+new Date().toLocaleString())&#13;
-System.log("Timer is set to wait till ~"+timer_date+" and will resume post wait time...!")</script>
+        <script encoded="false">System.log("======================================")&#13;
+System.log("Note: ")&#13;
+System.log("Before you run the workflow, check the timer_date VARIABLE value")&#13;
+System.log("if this value is set to FUTURE value from the curent date then it will wait for the time to get elapsed and resumes its execution")&#13;
+System.log("if this value is set to PAST value from the current date then it fails with Wait Signal Exception")&#13;
+System.log("======================================")&#13;
+&#13;
+System.log("Timer is set to wait till ~"+timer_date)&#13;
+</script>
         <in-binding>
             <bind name="timer_date" type="Date" export-name="timer_date"/>
         </in-binding>
