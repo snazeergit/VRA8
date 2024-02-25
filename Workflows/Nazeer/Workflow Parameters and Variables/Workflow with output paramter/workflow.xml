@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="39ece007-65c0-49c5-92d2-eec1d1399295" editor-version="2.0" version="0.0.2" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Workflow with output paramter</display-name>
+    <description>This workflow accepts two input parameters(in1, in2), and its result is stored in the output parameter(out_0).
+
+Important:
+When you invoke this workflow(Child) from any other workflow(Parent), you CAN bind this workflow(Child) output parameter(out_0) with the parent workflow by creating a new variable(var_0) in the parent workflow and mapping the child workflow's output parameter with parent workflows variable(var_0).
+
+Refer to: "Invoking child workflow that returns output" workflow.</description>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="in1" type="string"/>
+        <param name="in2" type="string"/>
+    </input>
+    <output>
+        <param name="out_0" type="string"/>
+    </output>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="320.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("-&gt;"+in1)&#13;
+System.log("-&gt;"+in2)&#13;
+out_0=in1+in2&#13;
+System.log("-&gt;"+out_0)</script>
+        <in-binding>
+            <bind name="in1" type="string" export-name="in1"/>
+            <bind name="in2" type="string" export-name="in2"/>
+        </in-binding>
+        <out-binding>
+            <bind name="out_0" type="string" export-name="out_0"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="180.0"/>
+    </workflow-item>
+</ns2:workflow>
