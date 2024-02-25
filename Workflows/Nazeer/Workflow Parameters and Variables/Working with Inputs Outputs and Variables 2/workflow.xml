@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="a81f79ec-221d-4286-9278-6fbe8d6921c1" editor-version="2.0" version="0.0.2" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Working with Inputs Outputs and Variables 2</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="i1" type="string"/>
+        <param name="i2" type="string"/>
+    </input>
+    <output>
+        <param name="o2" type="string"/>
+        <param name="o3" type="string"/>
+        <param name="o1" type="string"/>
+    </output>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="533.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>Scriptable task 1</display-name>
+        <script encoded="false">System.log("i1-&gt;"+i1)&#13;
+o1=i1+10&#13;
+System.log("o1-&gt;"+o1)&#13;
+</script>
+        <in-binding>
+            <bind name="i1" type="string" export-name="i1"/>
+        </in-binding>
+        <out-binding>
+            <bind name="o1" type="string" export-name="o1"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="180.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item3" type="task" comparator="0">
+        <display-name>Scriptable task 2</display-name>
+        <script encoded="false">System.log("i2-&gt;"+i2)&#13;
+o1=i2+10&#13;
+System.log("o1-&gt;"+o1)&#13;
+</script>
+        <in-binding>
+            <bind name="i2" type="string" export-name="i2"/>
+        </in-binding>
+        <out-binding>
+            <bind name="o1" type="string" export-name="o1"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="280.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task 3</display-name>
+        <script encoded="false">System.log("i1-&gt;"+i1)&#13;
+System.log("o1-&gt;"+o1)&#13;
+</script>
+        <in-binding>
+            <bind name="i1" type="string" export-name="i1"/>
+        </in-binding>
+        <out-binding>
+            <bind name="o1" type="string" export-name="o1"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="380.0"/>
+    </workflow-item>
+</ns2:workflow>
