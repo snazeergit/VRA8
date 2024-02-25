@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item3" object-name="workflow:name=generic" id="a8c90f5e-be6f-4c05-b58d-b26cbd4cfde8" editor-version="2.0" version="0.0.2" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Invoking child workflow that return output</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="in1" type="string"/>
+        <param name="in2" type="string"/>
+    </input>
+    <output/>
+    <attrib name="out_0" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="440.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log("=======================")&#13;
+System.log("Output : "+out_0)&#13;
+System.log("=======================")&#13;
+//Note: Even though we have binded result(OUTPUT type) of a workflow to another schema element as &#13;
+//OUTPUT(we can only bind it as a OUTPUT as the workflow result is mapped with OUTPUT type variable out_1)&#13;
+//the result value will not be carry forwarded and it will be NULL&#13;
+&#13;
+//To make it work change the inner workflow result type from OUTPUT to VARIABLE which has global scope&#13;
+// that mean its values will also be carry forwarded to one workflow to another.</script>
+        <in-binding>
+            <bind name="out_0" type="string" export-name="out_0"/>
+        </in-binding>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="280.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item2" type="link" linked-workflow-id="39ece007-65c0-49c5-92d2-eec1d1399295" comparator="0">
+        <display-name>Workflow returns result binded to Output type</display-name>
+        <script encoded="false"></script>
+        <in-binding>
+            <bind name="in1" type="string" export-name="in1"/>
+            <bind name="in2" type="string" export-name="in2"/>
+        </in-binding>
+        <out-binding>
+            <bind name="out_0" type="string" export-name="out_0"/>
+        </out-binding>
+        <description> </description>
+        <position y="60.0" x="160.0"/>
+    </workflow-item>
+</ns2:workflow>
