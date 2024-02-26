@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="52977fc1-ebe7-40fa-b0d0-59e1c997bdea" editor-version="2.0" version="1.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Simple VM</display-name>
+    <position y="50.0" x="80.0"/>
+    <input>
+        <param name="vmName" type="string">
+            <description>Virtual machine name</description>
+        </param>
+        <param name="vmGuestOs" type="VC:VirtualMachineGuestOsIdentifier">
+            <description>Guest operating system to use with the virtual machine</description>
+        </param>
+        <param name="vmHost" type="VC:HostSystem">
+            <description>Host on which to create the virtual machine</description>
+        </param>
+        <param name="vmMemorySize" type="number">
+            <description>Virtual machine's memory size in MB</description>
+        </param>
+        <param name="vmNoOfCPU" type="number">
+            <description>Number of virtual processors</description>
+        </param>
+        <param name="vmDiskSize" type="number">
+            <description>Size of virtual disk in GB</description>
+        </param>
+        <param name="vmNetwork" type="VC:Network">
+            <description>The network to connect to</description>
+        </param>
+        <param name="vmFolder" type="VC:VmFolder">
+            <description>Virtual machine folder</description>
+        </param>
+        <param name="vmResourcePool" type="VC:ResourcePool">
+            <description>Resource pool in which to create the virtual machine</description>
+        </param>
+        <param name="diskThinProvisioned" type="boolean">
+            <description>Make disk thin-provisioned?</description>
+        </param>
+        <param name="vmDatastore" type="VC:Datastore">
+            <description>
+Datastore in which to store the virtual machine files</description>
+        </param>
+    </input>
+    <output>
+        <param name="newVM" type="VC:VirtualMachine">
+            <description>The newly created VM</description>
+        </param>
+    </output>
+    <attrib name="pollRate" type="number">
+        <value encoded="n">1.0</value>
+        <description>Polling rate for the task state [seconds]</description>
+    </attrib>
+    <attrib name="task" type="VC:Task">
+        <value encoded="n"/>
+        <description>Task to Wait for</description>
+    </attrib>
+    <attrib name="progress" type="boolean">
+        <value encoded="n">false</value>
+        <description>Log progess while waiting for the task</description>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="460.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item2" type="task" comparator="0">
+        <display-name>CreateVmConfigSpec</display-name>
+        <script encoded="false">var vmConfigSpec=new VcVirtualMachineConfigSpec();&#13;
+vmConfigSpec.name=vmName;&#13;
+vmConfigSpec.guestId=vmGuestOs;&#13;
+vmConfigSpec.memoryMB=vmMemorySize;&#13;
+vmConfigSpec.numCPUs=vmNoOfCPU;&#13;
+&#13;
+var vmFileInfo =new VcVirtualMachineFileInfo();&#13;
+vmFileInfo.vmPathName="["+vmDatastore.info.name+"]";&#13;
+vmConfigSpec.files=vmFileInfo;&#13;
+&#13;
+var deviceConfigSpecs=new Array();&#13;
+var deviceConfigSpec;&#13;
+var i=0;&#13;
+&#13;
+//add floppy&#13;
+deviceConfigSpec=System.getModule("com.vmware.library.vc.vm.spec.config.device").createVirtualFloppyRemoteConfigSpec();&#13;
+deviceConfigSpecs[i++]=deviceConfigSpec;&#13;
+&#13;
+//add scsi Controller&#13;
+deviceConfigSpec=System.getModule("com.vmware.library.vc.vm.spec.config.device").createVirtualScsiControllerConfigSpec("LSI");&#13;
+deviceConfigSpecs[i++]= deviceConfigSpec;&#13;
+&#13;
+//add Disk&#13;
+deviceConfigSpec=System.getModule("com.vmware.library.vc.vm.spec.config.device").createVirtualDiskFlatVer2ConfigSpec(vmDiskSize,vmDatastore,0,0,VcVirtualDiskMode.persistent, diskThinProvisioned);&#13;
+deviceConfigSpecs[i++]=deviceConfigSpec;&#13;
+&#13;
+//add Network&#13;
+deviceConfigSpec=System.getModule("com.vmware.library.vc.vm.spec.config.device").createVirtualEthernetCardNetworkConfigSpec(vmNetwork);&#13;
+deviceConfigSpecs[i++]=deviceConfigSpec;&#13;
+&#13;
+//add all devices created to VM config spec&#13;
+vmConfigSpec.deviceChange=deviceConfigSpecs;&#13;
+&#13;
+//create VM&#13;
+task= vmFolder.createVM_Task(vmConfigSpec,vmResourcePool,vmHost);</script>
+        <in-binding>
+            <bind name="vmName" type="string" export-name="vmName"/>
+            <bind name="vmFolder" type="VC:VmFolder" export-name="vmFolder"/>
+            <bind name="vmHost" type="VC:HostSystem" export-name="vmHost"/>
+            <bind name="vmResourcePool" type="VC:ResourcePool" export-name="vmResourcePool"/>
+            <bind name="vmDiskSize" type="number" export-name="vmDiskSize"/>
+            <bind name="diskThinProvisioned" type="boolean" export-name="diskThinProvisioned"/>
+            <bind name="vmGuestOs" type="VC:VirtualMachineGuestOsIdentifier" export-name="vmGuestOs"/>
+            <bind name="vmMemorySize" type="number" export-name="vmMemorySize"/>
+            <bind name="vmNetwork" type="VC:Network" export-name="vmNetwork"/>
+            <bind name="vmNoOfCPU" type="number" export-name="vmNoOfCPU"/>
+            <bind name="vmDatastore" type="VC:Datastore" export-name="vmDatastore"/>
+        </in-binding>
+        <out-binding>
+            <bind name="task" type="VC:Task" export-name="task"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="160.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item0" type="task" script-module="com.vmware.library.vc.basic/vim3WaitTaskEnd" comparator="0">
+        <display-name>vim3WaitTaskEnd</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,progress,pollRate);
+</script>
+        <in-binding>
+            <bind name="task" type="VC:Task" export-name="task">
+                <description>Task to Wait for</description>
+            </bind>
+            <bind name="progress" type="boolean" export-name="progress">
+                <description>Log progess while waiting for the task</description>
+            </bind>
+            <bind name="pollRate" type="number" export-name="pollRate">
+                <description>Polling rate for the task state [seconds]</description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="VC:VirtualMachine" export-name="newVM"/>
+        </out-binding>
+        <description>Add a note to the workflow schema.</description>
+        <position y="60.0" x="300.0"/>
+    </workflow-item>
+</ns2:workflow>
