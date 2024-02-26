@@ -1,0 +1,1 @@
+{"schema":{"delay":{"id":"delay","type":{"dataType":"decimal"},"label":"delay","constraints":{"required":false}}},"layout":{"pages":[{"id":"page_d0wq00mg","title":"General","sections":[{"id":"section_bn0mxtjt","fields":[{"id":"delay","display":"decimalField","signpostPosition":"right-middle","state":{"visible":true,"read-only":false}}]}]}]},"itemId":""}
