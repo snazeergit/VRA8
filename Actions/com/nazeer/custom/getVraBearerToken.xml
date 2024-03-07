@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dunes-script-module name="getVraBearerToken" result-type="string" api-version="6.0.0" id="9fc741aa-6804-404f-8f5a-7f9a45c25c49" version="2.0.0" category-name="com.nazeer.custom">
+<dunes-script-module name="getVraBearerToken" result-type="string" api-version="6.0.0" id="9fc741aa-6804-404f-8f5a-7f9a45c25c49" version="3.0.0" category-name="com.nazeer.custom">
   <param n="restHost" t="REST:RESTHost"><![CDATA[Select the REST host]]></param>
   <param n="username" t="string"><![CDATA[Enter VRA username]]></param>
   <param n="password" t="SecureString"><![CDATA[Enter VRA password]]></param>
@@ -23,12 +23,12 @@ request.setHeader("Cache-Control","no-cache");
 var response = request.execute();
 
 //Formatting response
-if(requestResponse.statusCode == 200) {
-    refreshToken = JSON.parse(requestResponse.contentAsString).refresh_token;
+if(response.statusCode == 200) {
+    refreshToken = JSON.parse(response.contentAsString).refresh_token;
     System.log("refresh_token : " + refreshToken);    
 }else{
-    System.error("Bearer Token request has returned an error status code : " + requestResponse.statusCode);
-    throw "Error : " + requestResponse.statusCode;
+    System.error("Bearer Token request has returned an error status code : " + response.statusCode);
+    throw "Error : " + response.statusCode;
 }
 
 
@@ -52,12 +52,12 @@ request.setHeader("Cache-Control", "no-cache");
 var response = request.execute();
 
 //Formatting response
-if(requestResponse.statusCode == 200) {
-    bearerToken = JSON.parse(requestResponse.contentAsString).token;
+if(response.statusCode == 200) {
+    bearerToken = JSON.parse(response.contentAsString).token;
     System.log("bearer_token : "+bearerToken);   
     return bearerToken;
 }else{
-    System.error("Bearer Token request has returned an error status code : " + requestResponse.statusCode);
-    throw "Error : " + requestResponse.statusCode;
+    System.error("Bearer Token request has returned an error status code : " + response.statusCode);
+    throw "Error : " + response.statusCode;
 }]]></script>
 </dunes-script-module>
