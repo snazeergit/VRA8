@@ -1,9 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dunes-script-module name="getVraBearerToken" result-type="string" api-version="6.0.0" id="9fc741aa-6804-404f-8f5a-7f9a45c25c49" version="1.0.0" category-name="com.nazeer.custom">
+<dunes-script-module name="getVraBearerToken" result-type="string" api-version="6.0.0" id="9fc741aa-6804-404f-8f5a-7f9a45c25c49" version="2.0.0" category-name="com.nazeer.custom">
   <param n="restHost" t="REST:RESTHost"><![CDATA[Select the REST host]]></param>
   <param n="username" t="string"><![CDATA[Enter VRA username]]></param>
   <param n="password" t="SecureString"><![CDATA[Enter VRA password]]></param>
-  <param n="method" t="string"><![CDATA[Enter HTTP method to use]]></param>
   <script encoded="false"><![CDATA[//*****Fetching RefreshToken using VRA credentials*****
 
 //Endpoint url
@@ -13,7 +12,7 @@ var url = "/csp/gateway/am/api/login?access_token";
 var requestBody = '{ "username":"' + username + '", "password":"' + password + '" , "domain":"coke.sqa-horizon.local"}';
 
 //Request
-var request = restHost.createRequest(method, url, requestBody);
+var request = restHost.createRequest("POST", url, requestBody);
 
 //Headers
 request.setHeader("Accept", "application/json");
@@ -42,7 +41,7 @@ url = "/iaas/api/login";
 requestBody = '{ "refreshToken":"' + refreshToken + '"}';
 
 //Request
-request = restHost.createRequest(method, url, requestBody);
+request = restHost.createRequest("POST", url, requestBody);
 
 //Headers
 request.setHeader("Accept", "application/json");
