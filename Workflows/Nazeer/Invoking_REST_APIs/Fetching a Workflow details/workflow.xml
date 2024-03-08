@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="f7401ed8-eab2-4b2a-b24d-79b98cc31920" editor-version="2.0" version="1.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="f7401ed8-eab2-4b2a-b24d-79b98cc31920" editor-version="2.0" version="2.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
     <display-name>Fetching a Workflow details</display-name>
     <position y="50.0" x="100.0"/>
     <input>
@@ -62,10 +62,12 @@ request.setHeader("Authorization", "Bearer "+bearerToken);&#13;
 &#13;
 var response=request.execute();&#13;
 if(response.statusCode==200){&#13;
-    System.log("Response Code: "+response.statusCode);&#13;
-    System.log("Response Body: "+response.contentAsString);&#13;
+    var responseCode=response.statusCode;&#13;
+    var responseBody=response.contentAsString;&#13;
+    System.log("Response Code: "+responseCode);&#13;
+    System.log("Response Body: "+responseBody);&#13;
     apiResponse=new Properties();&#13;
-    var responseBody=JSON.parse(response.contentAsString);&#13;
+    apiResponse.put("responseCode",responseCode);&#13;
     apiResponse.put("responseBody",responseBody);&#13;
 }else{&#13;
     System.error("Request has errored out with status code : "+response.statusCode);&#13;
