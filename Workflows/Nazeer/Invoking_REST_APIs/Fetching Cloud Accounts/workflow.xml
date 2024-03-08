@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item3" object-name="workflow:name=generic" id="97acd160-6380-4eea-aa7b-1c738f7c5876" editor-version="2.0" version="2.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item3" object-name="workflow:name=generic" id="97acd160-6380-4eea-aa7b-1c738f7c5876" editor-version="2.0" version="3.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
     <display-name>Fetching Cloud Accounts</display-name>
     <position y="50.0" x="100.0"/>
     <input>
@@ -15,14 +15,12 @@
         <param name="method" type="string">
             <description>Enter HTTP method to use</description>
         </param>
-        <param name="url" type="string">
-            <description>URL of the VRA REST API to invoke</description>
-        </param>
-        <param name="requestBody" type="string">
-            <description>Requet Body of the REST API</description>
-        </param>
     </input>
-    <output/>
+    <output>
+        <param name="result" type="Properties">
+            <description>REST API response</description>
+        </param>
+    </output>
     <attrib name="bearerToken" type="string">
         <value encoded="n"></value>
     </attrib>
@@ -34,10 +32,10 @@
     <workflow-item name="item2" out-name="item0" type="task" comparator="0">
         <display-name>invoke REST API</display-name>
         <script encoded="false">//var url="/approval/api/approvals";&#13;
-//var url = "/iaas/api/cloud-accounts";&#13;
+var url = "/iaas/api/cloud-accounts";&#13;
 &#13;
 //Body&#13;
-//var requestBody = '';&#13;
+var requestBody = '';&#13;
 &#13;
 //Request&#13;
 var request = restHost.createRequest(method, url, requestBody);&#13;
@@ -50,12 +48,9 @@ request.setHeader("Cache-Control", "no-cache");&#13;
 &#13;
 //Response&#13;
 var response = request.execute();&#13;
-if(response.statusCode == 200) {&#13;
-    //apiResult = JSON.parse(response.contentAsString);&#13;
-    //System.log("response : "+requestResponse);   &#13;
-    //System.log("apiResult : "+apiResult);&#13;
-       &#13;
-    System.log("Response : " + response.contentAsString);&#13;
+if(response.statusCode == 200) {    &#13;
+    System.log("Response Code: "+response.statusCode) ;&#13;
+    System.log("Response Body: " + response.contentAsString);&#13;
     result = new Properties();&#13;
     result.put("statusCode", response.statusCode);&#13;
     result.put("contentLength", response.contentLength);&#13;
@@ -64,15 +59,94 @@ if(response.statusCode == 200) {&#13;
 }else{&#13;
     System.error("Request has returned an error status code : " + response.statusCode);&#13;
     throw "Error : " + response.statusCode;&#13;
-}</script>
+}&#13;
+&#13;
+/*&#13;
+SAMPLE API RESPONSE BODY:&#13;
+&#13;
+{&#13;
+  "content": [&#13;
+    {&#13;
+      "cloudAccountType": "vsphere",&#13;
+      "cloudAccountProperties": {&#13;
+        "hostName": "10.149.84.225",&#13;
+        "certificate": "-----BEGIN CERTIFICATE-----\nMIIE7TCCA1WgAwIBAgIJAOjvK0rOXTgmMA0GCSqGSIb3DQEBCwUAMIGjMQswCQYD\nVQQDDAJDQTEXMBUGCgmSJomT8ixkARkWB3ZzcGhlcmUxFTATBgoJkiaJk/IsZAEZ\nFgVsb2NhbDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExJTAjBgNV\nBAoMHGNhdmEtbi04NC0yMjUuZW5nLnZtd2FyZS5jb20xGzAZBgNVBAsMElZNd2Fy\nZSBFbmdpbmVlcmluZzAeFw0yNDAyMDIwMTIxMjlaFw0yNjAyMDExMzIxMjlaMCUx\nFjAUBgNVBAMMDTEwLjE0OS44NC4yMjUxCzAJBgNVBAYTAlVTMIIBojANBgkqhkiG\n9w0BAQEFAAOCAY8AMIIBigKCAYEAwZm3EdBU2naE5vBAgm6/n3AgugV2VMLz2oPw\ncQ8KHTJR3DIBpzA+IMOnS7VVDCgIKknhOtzDzXojpYB1FzfFiSKgzcnYv5N6MDxa\n9iLTRYstgvja/y6gDcf0k+BuMKkE86KevJZx3lNYJ6fbCoaPjJOth8CSxtsWZIGh\n9smy1ZLgGUVhsLcs4/qELWz9DqYR+hKeLuyYDvP+jGvqQLFN4hGaVLrL5tFKR4l/\n5O8jLcjstsM7JYliFE/c5lfxmZQAO9JAaFeTQMqHsgQ47EleBHC+U/bZtl5U4hRI\nLRZzhiF+dv2LQ536ry+oceP3rE3Rejk1ZGrdrp09NDx5I8LIgKxJ0V1Vnt8h3SZS\n2UN3R6bQirR3IVmQmqaUj4et0ndYhNOnbYeDx6oU7dssKIp4uGvICmUx4teNIHr2\nYQ0v0I3gzWsEoVVppWZVk9B5IxkizMhSNXGElN/eHqN8xJS0+mhnaQBQQz52AW5k\nbxkS6B3zpksU4F+9/494goovy4iTAgMBAAGjgaAwgZ0wCwYDVR0PBAQDAgXgMA8G\nA1UdEQQIMAaHBAqVVOEwHQYDVR0OBBYEFNcLFM6H6oKU85Ad2XGewwkRyfa3MB8G\nA1UdIwQYMBaAFEKyjLIbBxBeNHtG9Jx1OkUw7UJrMD0GCCsGAQUFBwEBBDEwLzAt\nBggrBgEFBQcwAoYhaHR0cHM6Ly8xMC4xNDkuODQuMjI1L2FmZC92ZWNzL2NhMA0G\nCSqGSIb3DQEBCwUAA4IBgQA2pFuVlMff2aaRQUVzX3DTX1nsO5lsYClNRZeC8CmC\n0yJ96DaZ/0Hq1Nkk9MWFs9WDw8CcUNGjTEWWIVvG+FVFsS4D3TRCYynJQAiLV+Y+\nTc8PUrBVm3oAD3TKezzvwPB1bWVzcCs/qkQbbdPcKQczJ99KoMqM/a8cXdbc4M38\nf+oD2YYwitkNz+nQuz1jnTsg5Xtixcpj3UZspLFS0s8i5zyZQxpAVTb80JdJ0Su7\nE2Xm3nqakjgS/DIInaME5tVecFwTWcyzvG5auf7xQlpJsss5zzSq0md8j6GpYlK+\nPtkre8aa1tgIr0TjM/2tO6E3Dbf2HNaRzhxeJCuMJZA2CrxQRtv7zaPROlhS//Bn\nzi7m4457mu9QOLbaBsAHdqLVtIbpB2dCMe7LQn9vFZP0OtyJdba0W+NJm76iUNvl\n58Ca8hy92cCgPsPOvLMqdaJvaiugE8slnk6T+o7oiImFyIerkoL9GU6nXpdsD7hB\nbbyAV29Sb6Su9pC0cra201g=\n-----END CERTIFICATE-----\n",&#13;
+        "privateKeyId": "administrator@vsphere.local",&#13;
+        "supportTagging": "{\"documentKinds\":[\"com:vmware:photon:controller:model:resources:ComputeService:ComputeState\"],\"enabled\":true}",&#13;
+        "supportDatastores": "true"&#13;
+      },&#13;
+      "enabledRegionIds": [&#13;
+        "Datacenter:datacenter-3"&#13;
+      ],&#13;
+      "enabledRegions": [&#13;
+        {&#13;
+          "externalRegionId": "Datacenter:datacenter-3",&#13;
+          "name": "Datacenter",&#13;
+          "cloudAccountId": "7fa53904-0820-4691-84b6-5c09cec3df6e",&#13;
+          "id": "de8401d9-008d-4988-8750-d1d42ce1c11a",&#13;
+          "updatedAt": "2024-02-22",&#13;
+          "organizationId": "1accb653-bfca-4b2d-92dc-e0ca66cee3a7",&#13;
+          "orgId": "1accb653-bfca-4b2d-92dc-e0ca66cee3a7",&#13;
+          "_links": {&#13;
+            "self": {&#13;
+              "href": "/iaas/api/regions/de8401d9-008d-4988-8750-d1d42ce1c11a"&#13;
+            },&#13;
+            "cloud-account": {&#13;
+              "href": "/iaas/api/cloud-accounts/7fa53904-0820-4691-84b6-5c09cec3df6e"&#13;
+            }&#13;
+          }&#13;
+        }&#13;
+      ],&#13;
+      "customProperties": {&#13;
+        "hostName": "10.149.84.225",&#13;
+        "acceptSelfSignedCertificate": "false",&#13;
+        "lastImageEnumerationTimestampMicro": "1709861648895000",&#13;
+        "certificate": "-----BEGIN CERTIFICATE-----\nMIIE7TCCA1WgAwIBAgIJAOjvK0rOXTgmMA0GCSqGSIb3DQEBCwUAMIGjMQswCQYD\nVQQDDAJDQTEXMBUGCgmSJomT8ixkARkWB3ZzcGhlcmUxFTATBgoJkiaJk/IsZAEZ\nFgVsb2NhbDELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExJTAjBgNV\nBAoMHGNhdmEtbi04NC0yMjUuZW5nLnZtd2FyZS5jb20xGzAZBgNVBAsMElZNd2Fy\nZSBFbmdpbmVlcmluZzAeFw0yNDAyMDIwMTIxMjlaFw0yNjAyMDExMzIxMjlaMCUx\nFjAUBgNVBAMMDTEwLjE0OS44NC4yMjUxCzAJBgNVBAYTAlVTMIIBojANBgkqhkiG\n9w0BAQEFAAOCAY8AMIIBigKCAYEAwZm3EdBU2naE5vBAgm6/n3AgugV2VMLz2oPw\ncQ8KHTJR3DIBpzA+IMOnS7VVDCgIKknhOtzDzXojpYB1FzfFiSKgzcnYv5N6MDxa\n9iLTRYstgvja/y6gDcf0k+BuMKkE86KevJZx3lNYJ6fbCoaPjJOth8CSxtsWZIGh\n9smy1ZLgGUVhsLcs4/qELWz9DqYR+hKeLuyYDvP+jGvqQLFN4hGaVLrL5tFKR4l/\n5O8jLcjstsM7JYliFE/c5lfxmZQAO9JAaFeTQMqHsgQ47EleBHC+U/bZtl5U4hRI\nLRZzhiF+dv2LQ536ry+oceP3rE3Rejk1ZGrdrp09NDx5I8LIgKxJ0V1Vnt8h3SZS\n2UN3R6bQirR3IVmQmqaUj4et0ndYhNOnbYeDx6oU7dssKIp4uGvICmUx4teNIHr2\nYQ0v0I3gzWsEoVVppWZVk9B5IxkizMhSNXGElN/eHqN8xJS0+mhnaQBQQz52AW5k\nbxkS6B3zpksU4F+9/494goovy4iTAgMBAAGjgaAwgZ0wCwYDVR0PBAQDAgXgMA8G\nA1UdEQQIMAaHBAqVVOEwHQYDVR0OBBYEFNcLFM6H6oKU85Ad2XGewwkRyfa3MB8G\nA1UdIwQYMBaAFEKyjLIbBxBeNHtG9Jx1OkUw7UJrMD0GCCsGAQUFBwEBBDEwLzAt\nBggrBgEFBQcwAoYhaHR0cHM6Ly8xMC4xNDkuODQuMjI1L2FmZC92ZWNzL2NhMA0G\nCSqGSIb3DQEBCwUAA4IBgQA2pFuVlMff2aaRQUVzX3DTX1nsO5lsYClNRZeC8CmC\n0yJ96DaZ/0Hq1Nkk9MWFs9WDw8CcUNGjTEWWIVvG+FVFsS4D3TRCYynJQAiLV+Y+\nTc8PUrBVm3oAD3TKezzvwPB1bWVzcCs/qkQbbdPcKQczJ99KoMqM/a8cXdbc4M38\nf+oD2YYwitkNz+nQuz1jnTsg5Xtixcpj3UZspLFS0s8i5zyZQxpAVTb80JdJ0Su7\nE2Xm3nqakjgS/DIInaME5tVecFwTWcyzvG5auf7xQlpJsss5zzSq0md8j6GpYlK+\nPtkre8aa1tgIr0TjM/2tO6E3Dbf2HNaRzhxeJCuMJZA2CrxQRtv7zaPROlhS//Bn\nzi7m4457mu9QOLbaBsAHdqLVtIbpB2dCMe7LQn9vFZP0OtyJdba0W+NJm76iUNvl\n58Ca8hy92cCgPsPOvLMqdaJvaiugE8slnk6T+o7oiImFyIerkoL9GU6nXpdsD7hB\nbbyAV29Sb6Su9pC0cra201g=\n-----END CERTIFICATE-----\n",&#13;
+        "patchLevel": "00000",&#13;
+        "version": "8.0.2",&#13;
+        "buildNumber": "22385739",&#13;
+        "lastSuccessfulImageEnumerationTimestampMicro": "1709861648895000",&#13;
+        "lastSuccessfulEnumerationTimestampMicro": "1709875561233000",&#13;
+        "imageEnumerationTaskState": "FINISHED",&#13;
+        "dcId": "onprem",&#13;
+        "lastEnumerationTimestampMicro": "1709875561233000",&#13;
+        "enumerationTaskState": "FINISHED",&#13;
+        "wcpEnabled": "false",&#13;
+        "privateKeyId": "administrator@vsphere.local",&#13;
+        "vcUuid": "a20aa248-6ebd-4997-98e3-2f0fece7be0f"&#13;
+      },&#13;
+      "healthy": true,&#13;
+      "name": "vCenter",&#13;
+      "id": "7fa53904-0820-4691-84b6-5c09cec3df6e",&#13;
+      "createdAt": "2024-02-22",&#13;
+      "updatedAt": "2024-03-08",&#13;
+      "organizationId": "1accb653-bfca-4b2d-92dc-e0ca66cee3a7",&#13;
+      "orgId": "1accb653-bfca-4b2d-92dc-e0ca66cee3a7",&#13;
+      "_links": {&#13;
+        "regions": {&#13;
+          "hrefs": [&#13;
+            "/iaas/api/regions/de8401d9-008d-4988-8750-d1d42ce1c11a"&#13;
+          ]&#13;
+        },&#13;
+        "self": {&#13;
+          "href": "/iaas/api/cloud-accounts/7fa53904-0820-4691-84b6-5c09cec3df6e"&#13;
+        }&#13;
+      }&#13;
+    }&#13;
+  ],&#13;
+  "totalElements": 1,&#13;
+  "numberOfElements": 1&#13;
+}&#13;
+&#13;
+*/</script>
         <in-binding>
             <bind name="bearerToken" type="string" export-name="bearerToken"/>
             <bind name="restHost" type="REST:RESTHost" export-name="restHost"/>
-            <bind name="url" type="string" export-name="url"/>
             <bind name="method" type="string" export-name="method"/>
-            <bind name="requestBody" type="string" export-name="requestBody"/>
         </in-binding>
-        <out-binding/>
+        <out-binding>
+            <bind name="result" type="Properties" export-name="result"/>
+        </out-binding>
         <description>Simple task with custom script capability.</description>
         <position y="60.0" x="300.0"/>
     </workflow-item>
