@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="5af54923-da3c-4558-a662-c8e84550a659" editor-version="2.0" version="2.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="5af54923-da3c-4558-a662-c8e84550a659" editor-version="2.0" version="3.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
     <display-name>Fetching VRO Package</display-name>
     <position y="50.0" x="100.0"/>
     <input>
@@ -16,7 +16,9 @@
             <description>VRO package name to fetch</description>
         </param>
     </input>
-    <output/>
+    <output>
+        <param name="apiResponse" type="Properties"/>
+    </output>
     <attrib name="bearerToken" type="string">
         <value encoded="n"></value>
     </attrib>
@@ -76,7 +78,9 @@ if(response.statusCode==200){&#13;
             <bind name="bearerToken" type="string" export-name="bearerToken"/>
             <bind name="packageName" type="string" export-name="packageName"/>
         </in-binding>
-        <out-binding/>
+        <out-binding>
+            <bind name="apiResponse" type="Properties" export-name="apiResponse"/>
+        </out-binding>
         <description>Simple task with custom script capability.</description>
         <position y="60.0" x="300.0"/>
     </workflow-item>
