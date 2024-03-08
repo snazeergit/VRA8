@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="a3d0bae4-21f6-497c-9398-4d4d5618d744" editor-version="2.0" version="1.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
-    <display-name>Fetching Workflow Details</display-name>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="a3d0bae4-21f6-497c-9398-4d4d5618d744" editor-version="2.0" version="2.0.0" api-version="6.0.0" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Fetching All Workflows</display-name>
     <position y="50.0" x="100.0"/>
     <input>
         <param name="restHost" type="REST:RESTHost">
@@ -13,7 +13,9 @@
             <description>Enter VRA password</description>
         </param>
     </input>
-    <output/>
+    <output>
+        <param name="apiResponse" type="Properties"/>
+    </output>
     <attrib name="bearerToken" type="string">
         <value encoded="n"></value>
     </attrib>
@@ -45,7 +47,7 @@ actionResult = System.getModule("com.nazeer.custom").getVraBearerToken(restHost,
         <position y="60.0" x="160.0"/>
     </workflow-item>
     <workflow-item name="item2" out-name="item0" type="task" comparator="0">
-        <display-name>fetch workflow details</display-name>
+        <display-name>fetch all workflow details</display-name>
         <script encoded="false">var url="/vco/api/workflows";&#13;
 var payload="";&#13;
 var request=restHost.createRequest("GET", url, payload);&#13;
@@ -57,18 +59,25 @@ request.setHeader("Authorization", "Bearer "+bearerToken);&#13;
 &#13;
 var response=request.execute();&#13;
 if(response.statusCode==200){&#13;
-    System.log("Response Code: "+response.statusCode);&#13;
-    System.log("Response Body: "+response.contentAsString);&#13;
+    var responseCode=response.statusCode;&#13;
+    var responseBody=response.contentAsString;&#13;
+    System.log("Response Code: "+responseCode);&#13;
+    System.log("Response Body: "+responseBody);&#13;
+    apiResponse=new Properties();&#13;
+    apiResponse.put("responseCode",responseCode);&#13;
+    apiResponse.put("responseBody",responseBody);&#13;
 }else{&#13;
-    System.error("Request has errored out with status code : "+response.statusCode);&#13;
-    throw "Error : "+response.statusCode;&#13;
+    System.error("Request has errored out with status code : "+responseCode);&#13;
+    throw "Error : "+responseCode;&#13;
 }&#13;
 </script>
         <in-binding>
             <bind name="restHost" type="REST:RESTHost" export-name="restHost"/>
             <bind name="bearerToken" type="string" export-name="bearerToken"/>
         </in-binding>
-        <out-binding/>
+        <out-binding>
+            <bind name="apiResponse" type="Properties" export-name="apiResponse"/>
+        </out-binding>
         <description>Simple task with custom script capability.</description>
         <position y="60.0" x="300.0"/>
     </workflow-item>
