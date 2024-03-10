@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getVmNetwork" result-type="Array/VC:Network" api-version="6.0.0" id="bbc64593-e553-4b91-8b72-00f81063da09" version="1.0.0" category-name="com.nazeer.custom">
+  <param n="vmName" t="VC:VirtualMachine"><![CDATA[]]></param>
+  <script encoded="false"><![CDATA[return vmName.network;]]></script>
+</dunes-script-module>
