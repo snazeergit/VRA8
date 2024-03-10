@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getVmHost" result-type="VC:HostSystem" api-version="6.0.0" id="133b2e63-b6aa-4ee2-9d64-71994c116a80" version="1.0.0" category-name="com.nazeer.custom">
+  <description><![CDATA[returns HostSystem object]]></description>
+  <param n="vmName" t="VC:VirtualMachine"><![CDATA[]]></param>
+  <script encoded="false"><![CDATA[return vmName.runtime.host;]]></script>
+</dunes-script-module>
