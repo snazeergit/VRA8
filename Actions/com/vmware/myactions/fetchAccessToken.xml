@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="fetchAccessToken" result-type="string" api-version="6.0.0" id="7727b577-b9e7-4449-bab7-5ec087dd0c13" version="1.0.0" allowed-operations="vfe" category-name="com.vmware.myactions">
+  <environment><![CDATA[e72d366d-89af-4025-a119-1a1d5b954ceb]]></environment>
+  <param n="user" t="string"><![CDATA[]]></param>
+  <param n="pwd" t="SecureString"><![CDATA[]]></param>
+  <script encoded="false"><![CDATA[/*
+Note:
+Create a NodeJS Environment with below dependencies:
+1. loadsh 4.17.21
+2. request latest
+*/
+
+const request = require('request').defaults({strictSSL: false});
+exports.handler = (context, inputs, callback) => {
+    const user=inputs.user
+    const pwd=inputs.pwd
+	const options = {
+		url: 'https://cava-n-81-080.eng.vmware.com/csp/gateway/am/api/login?access_token',
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+        json:true,
+        body:{
+            username : user,
+            password : pwd,
+            domain : 'coke.sqa-horizon.local'
+        }
+	};
+
+	request(options, function(error, response, body) {
+    //console.log("error :" , error)
+    //console.log("response :" , response)
+    console.log("Refresh token :" , body.refresh_token)
+	//console.log('Response.statusCode: ' + response.statusCode);		
+	callback(null, body.refresh_token); 
+	//let json = JSON.parse(body);
+	//console.log('Response body: ')
+	//console.log(json);
+	});
+}]]></script>
+</dunes-script-module>
