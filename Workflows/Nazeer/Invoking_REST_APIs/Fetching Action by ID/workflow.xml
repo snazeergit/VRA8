@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item3" object-name="workflow:name=generic" id="02a2a162-70ac-4aca-bbba-f8b8a5a61237" editor-version="2.0" version="5.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Fetching Action by ID</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="restHost" type="REST:RESTHost">
+            <description>Select the REST host</description>
+        </param>
+        <param name="username" type="string">
+            <description>Enter VRA username</description>
+        </param>
+        <param name="password" type="SecureString">
+            <description>Enter VRA password</description>
+        </param>
+        <param name="method" type="string">
+            <description>Enter HTTP method to use</description>
+        </param>
+        <param name="url" type="string">
+            <description>VRA REST API Url</description>
+        </param>
+        <param name="requestBody" type="string">
+            <description>Requet Body of the REST API</description>
+        </param>
+    </input>
+    <output>
+        <param name="apiResponse" type="Properties"/>
+    </output>
+    <attrib name="bearerToken" type="string">
+        <value encoded="n"></value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="460.0"/>
+    </workflow-item>
+    <workflow-item name="item2" out-name="item0" type="task" comparator="0">
+        <display-name>invoke REST API</display-name>
+        <script encoded="false">//Url&#13;
+//var url="/abx/api/resources/actions/?id=ee21edbb-2dfb-4ff9-b963-20f1298051ad";&#13;
+&#13;
+//Body&#13;
+//var requestBody = '';&#13;
+&#13;
+//Request&#13;
+var request = restHost.createRequest(method, url, requestBody);&#13;
+&#13;
+//Header&#13;
+request.setHeader("Authorization", "Bearer "+bearerToken);&#13;
+request.setHeader("Accept", "application/json");&#13;
+request.setHeader("Content-Type", "application/json");&#13;
+request.setHeader("Cache-Control", "no-cache");&#13;
+&#13;
+//Response&#13;
+var response = request.execute();&#13;
+if(response.statusCode == 200) {    &#13;
+    System.log("Response Code: "+response.statusCode) ;&#13;
+    System.log("Response Body: " + response.contentAsString);&#13;
+    apiResponse = new Properties();&#13;
+    apiResponse.put("statusCode", response.statusCode);&#13;
+    apiResponse.put("contentLength", response.contentLength);&#13;
+    apiResponse.put("headers", response.getAllHeaders());&#13;
+    apiResponse.put("contentAsString", response.contentAsString);&#13;
+}else{&#13;
+    System.error("Request has returned an error status code : " + response.statusCode);&#13;
+    throw "Error : " + response.statusCode;&#13;
+}</script>
+        <in-binding>
+            <bind name="bearerToken" type="string" export-name="bearerToken"/>
+            <bind name="restHost" type="REST:RESTHost" export-name="restHost"/>
+            <bind name="method" type="string" export-name="method"/>
+            <bind name="requestBody" type="string" export-name="requestBody"/>
+            <bind name="url" type="string" export-name="url"/>
+        </in-binding>
+        <out-binding>
+            <bind name="apiResponse" type="Properties" export-name="apiResponse"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="300.0"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item2" type="task" script-module="com.nazeer.custom/getVraBearerToken" comparator="0">
+        <display-name>getVraBearerToken</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.nazeer.custom").getVraBearerToken(restHost,username,password);
+</script>
+        <in-binding>
+            <bind name="restHost" type="REST:RESTHost" export-name="restHost">
+                <description>Select the REST host</description>
+            </bind>
+            <bind name="username" type="string" export-name="username">
+                <description>Enter VRA username</description>
+            </bind>
+            <bind name="password" type="SecureString" export-name="password">
+                <description>Enter VRA password</description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="string" export-name="bearerToken"/>
+        </out-binding>
+        <description>Add a note to the workflow schema.</description>
+        <position y="60.0" x="160.0"/>
+    </workflow-item>
+</ns2:workflow>
