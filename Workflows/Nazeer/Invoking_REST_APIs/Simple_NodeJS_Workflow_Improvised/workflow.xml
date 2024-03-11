@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="47676706-8a45-4a54-894b-e04cf6c43aea" editor-version="2.0" version="1.0.0" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Simple_NodeJS_Workflow_Improvised</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="hostname" type="string"/>
+        <param name="dnsServers" type="Array/string"/>
+    </input>
+    <output>
+        <param name="results" type="Array/string"/>
+    </output>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="300.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item0" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <runtime>environment:e72d366d-89af-4025-a119-1a1d5b954ceb</runtime>
+        <script encoded="false">exports.handler = (context, inputs, callback) =&gt; {
+    console.log('Inputs were ' + JSON.stringify(inputs));
+    const {Resolver}=require('dns');
+    const resolver=new Resolver();
+    console.log('Querying DNS results for : %j',inputs.hostname);
+    resolver.setServers(inputs.dnsServers);
+    resolver.resolve(inputs.hostname,(err, addresses)=&gt; {
+        console.log('Results: %j', addresses);
+        callback(undefined, {status: "done", results: addresses});
+    });  
+}
+</script>
+        <in-binding>
+            <bind name="hostname" type="string" export-name="hostname"/>
+            <bind name="dnsServers" type="Array/string" export-name="dnsServers"/>
+        </in-binding>
+        <out-binding>
+            <bind name="results" type="Array/string" export-name="results"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="160.0"/>
+        <environment name="NodeJS_18">
+            <id>e72d366d-89af-4025-a119-1a1d5b954ceb</id>
+        </environment>
+    </workflow-item>
+</ns2:workflow>
